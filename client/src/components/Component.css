@@ -1,0 +1,24 @@
+.piano-container {
+    display: flex;
+    background-color: darkgrey;
+}
+
+.piano-container > div {
+    background-color: #f1f1f1;
+    color: black;
+    width: 50px;
+    height: 75px;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+    line-height: 75px;
+    font-size: 30px;
+
+}
+
+.piano-container > div:hover {
+    background-color: DodgerBlue;
+    color: white;
+    cursor: pointer;
+
+}
