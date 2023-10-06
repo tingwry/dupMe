@@ -22,8 +22,8 @@ io.on("connection", (socket) => {
     //     socket.join(data);
     // })
 
-    socket.on("send_message", (data) => {
-        socket.to(data.room).emit("receive_message", data)
+    socket.on("send_noteslist", (data) => {
+        socket.broadcast.emit("receive_noteslist", data)
     })
 })
 
