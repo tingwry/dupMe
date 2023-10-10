@@ -5,13 +5,14 @@ import "./App.css";
 import Piano from "./components/Piano";
 
 import { io } from "socket.io-client";
+import JoinRoom from "./components/JoinRoom";
 
 const socket = io("http://localhost:3000");
 
 function App() {
   return (
     <div className="App">
-      <Piano />
+      <JoinRoom />
     </div>
   );
 }

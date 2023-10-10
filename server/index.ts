@@ -21,9 +21,16 @@ io.on("connection", (socket) => {
     // socket.on("join_room", (data) => {
     //     socket.join(data);
     // })
+    socket.on("join_room", (data) => {
+        socket.join(data);
+    })
+
+    socket.on("send_name", (data) => {
+        socket.to(data.room).emit("receive_name", data)
+    })
 
     socket.on("send_noteslist", (data) => {
-        socket.broadcast.emit("receive_noteslist", data)
+        socket.to(data.room).emit("receive_noteslist", data);
     })
 })
 
