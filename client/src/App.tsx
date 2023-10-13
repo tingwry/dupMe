@@ -6,13 +6,14 @@ import Piano from "./components/Piano";
 
 import { io } from "socket.io-client";
 import JoinRoom from "./components/JoinRoom";
+import User from "./components/User";
 
-const socket = io("http://localhost:3000");
 
 function App() {
   return (
     <div className="App">
       <JoinRoom />
+      <User />
     </div>
   );
 }

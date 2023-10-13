@@ -1,29 +1,28 @@
 import React, { useEffect, useState } from "react";
 import "./Component.css";
 import { io } from "socket.io-client";
-
-const socket = io("http://localhost:3000");
+import socket from "../socket";
 
 function Piano() {
   const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
 
   // Notes clicking
-  const [noteslist, setNoteslist] = useState<{ id: number; note: string }[]>(
+  const [notelist, setNotelist] = useState<{ id: number; note: string }[]>(
     []
   );
   const handleClickNote = (item: string) => {
-    const newNote = { id: noteslist.length, note: item };
-    setNoteslist([...noteslist, newNote]); //Add in array
+    const newNote = { id: notelist.length, note: item };
+    setNotelist([...notelist, newNote]); //Add in array
   };
 
   useEffect(() => {
-    console.log("A note added", noteslist);
-  }, [noteslist]);
+    console.log("A note added", notelist);
+  }, [notelist]);
 
   // Socket event for sending notes
-  const sendNoteslist = () => {
-    console.log("Noteslist is sent", noteslist);
-    // socket.emit("send_noteslist", { noteslist, room });
+  const sendNotelist = () => {
+    console.log("Notelist is sent", notelist);
+    // socket.emit("send_notelist", { notelist, room });
   };
 
   /// Timer for sending notes
@@ -33,7 +32,7 @@ function Piano() {
     const timer = setInterval(() => {
       setSecondsLeft((prevSecondsLeft) => {
         if (prevSecondsLeft === 1) {
-          // sendNoteslist();
+          // sendNotelist();
           clearInterval(timer);
           return 0;
         }
@@ -46,22 +45,22 @@ function Piano() {
 
   useEffect(() => {
     if (secondsLeft === 0) {
-      sendNoteslist();
-      setNoteslist([]);
+      sendNotelist();
+      setNotelist([]);
     }
   }, [secondsLeft]);
 
   // Received notes
-  const [noteslistReceived, setNoteslistReceived] = useState<
+  const [notelistReceived, setNotelistReceived] = useState<
     { id: number; note: string }[]
   >([]);
 
   useEffect(() => {
-    socket.on("receive_noteslist", (data) => {
-      setNoteslistReceived(data);
-      console.log("receive_noteslist", data);
+    socket.on("receive_notelist", (data) => {
+      setNotelistReceived(data);
+      console.log("receive_notelist", data);
       setSecondsLeft(20);
-      setNoteslist([]);
+      setNotelist([]);
     });
   }, [socket]);
 
@@ -85,14 +84,14 @@ function Piano() {
 
       <h1>Display</h1>
       <div className="piano-container">
-        {noteslist.map((item) => (
+        {notelist.map((item) => (
           <div key={item.id}>{item.note}</div>
         ))}
       </div>
 
       <h1>Received</h1>
       <div className="piano-container">
-        {noteslistReceived.map((item) => (
+        {notelistReceived.map((item) => (
           <div key={item.id}>{item.note}</div>
         ))}
       </div>
