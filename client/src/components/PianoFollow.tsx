@@ -3,18 +3,17 @@ import './Component.css';
 import socket from '../socket';
 import Countdown from './Countdown';
 
+interface Props {
+    room: string;
+}
 
-function PianoP2() {
+function PianoFollow(room: Props) {
     const allnotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const [notelist, setNotelist] = useState<{id: number, note: string}[]>([]);
     const [isRunning, setIsRunning] = useState(false);
+    const [notelistReceived, setNotelistReceived] = useState<{id: number, note: string}[]>([]);
 
-    //handle P2 ready
-    const handleReady = () => {
-        console.log("P2 ready");
-    };
-
-    // Notes clicking
+    // Click note
     const handleClickNote = (item: string) => {
         const newNote = {id: notelist.length, note:item};
         setNotelist([...notelist, newNote]); //Add in array
@@ -24,12 +23,10 @@ function PianoP2() {
         console.log("A note added", notelist)
     }, [notelist])
 
-    // Received notes
-    const [notelistReceived, setNotelistReceived] = useState<{id: number, note: string}[]>([]);
-
+    // Socket event for receiving notes
     useEffect(() => {
         socket.on("receive_notelist", (data) => {
-            setNotelistReceived(data);
+            setNotelistReceived(data.notelist);
             console.log("receive_notelist", data);
             setIsRunning(true);
             setNotelist([]);
@@ -58,7 +55,7 @@ function PianoP2() {
     return (
         <>
         <h1>Piano P2</h1>
-        <p>P1 Seconds left:</p> <Countdown duration={20} running={isRunning} onTimeout={() => checkNotelist(notelistReceived, notelist)} />
+        <p>P2 Seconds left:</p> <Countdown duration={20} running={isRunning} onTimeout={() => checkNotelist(notelistReceived, notelist)} />
 
         <p>score: {score}</p>
 
@@ -87,4 +84,4 @@ function PianoP2() {
     )
 }
 
-export default PianoP2
+export default PianoFollow

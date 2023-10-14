@@ -3,18 +3,23 @@ import './Component.css';
 import socket from '../socket';
 import Countdown from './Countdown';
 
-function PianoP1() {
+interface Props {
+    room: string;
+}
+
+function PianoCreate({room}: Props) {
     const allnotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const [notelist, setNotelist] = useState<{id: number, note: string}[]>([]);
     const [isRunning, setIsRunning] = useState(false);
 
-    //handle P1 ready
+    // First Player can start creating pattern
     const handleStart = () => {
         console.log("P1 start");
+        setNotelist([]);
         setIsRunning(true);
     };
 
-    // Notes clicking
+    // Click note
     const handleClickNote = (item: string) => {
         const newNote = {id: notelist.length, note:item};
         setNotelist([...notelist, newNote]); //Add in array
@@ -26,10 +31,10 @@ function PianoP1() {
 
     // Socket event for sending notes
     const sendNotelist = () => {
-        console.log("Notelist is sent", notelist)
-        socket.emit("send_notelist", notelist);
+        console.log("Notelist is sent", { room, notelist: notelist })
+        socket.emit("send_notelist", { room, notelist: notelist });
     };
-
+    
     return (
         <>
         <h1>Piano P1</h1>
@@ -56,4 +61,4 @@ function PianoP1() {
     )
 }
 
-export default PianoP1
+export default PianoCreate

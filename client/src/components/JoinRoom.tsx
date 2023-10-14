@@ -1,31 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import socket from "../socket";
+import PianoCreate from "./PianoCreate";
+import PianoFollow from "./PianoFollow";
+import Piano from "./Piano";
 
 function JoinRoom() {
   // Join room
   const [room, setRoom] = useState("");
-  const [name, setName] = useState("");
-  const [nameReceived, setNameReceived] = useState("");
-  const [showNameInput, setShowNameInput] = useState(false);
+  const [enteredRoom, setEnteredRoom] = useState(false);
+  const [playersInRoom, setPlayersInRoom] = useState<{id: string, name: string, room: string}[]>([]);
 
   const joinRoom = () => {
     if (room !== "") {
       socket.emit("join_room", room);
-      setShowNameInput(true);
-      console.log("join room", room);
+      setEnteredRoom(true);
+      console.log("join_room", room);
     }
   };
 
-  const sendName = () => {
-    socket.emit("send_name", { name, room });
-    console.log("send_name", { name, room });
-  };
-
   useEffect(() => {
-    socket.on("receive_name", (data) => {
-      setNameReceived(data.name);
-      console.log("receive_name", data, data.name);
+    socket.on("players_in_room", (data) => {
+      setPlayersInRoom(data);
+      console.log("players_in_room", data);
     });
   }, [socket]);
 
@@ -40,17 +37,16 @@ function JoinRoom() {
       />
       <button onClick={joinRoom}> Join Room</button>
 
-      {showNameInput && (
+      {enteredRoom && (
         <>
-          <input
-            placeholder="Enter Name..."
-            onChange={(event) => {
-              setName(event.target.value);
-            }}
-          />
-          <button onClick={sendName}> Submit</button>
+          <p>room: {room}</p>
+          {playersInRoom.map((item) => (
+              <div key={item.id}>{item.id}, {item.name}, {item.room}</div>
+          ))}
 
-          <p>{nameReceived}</p>
+        {/* <PianoCreate room={room} />
+        <PianoFollow room={room}/> */}
+        <Piano room={room}/>
         </>
       )}
     </>

@@ -1,102 +1,108 @@
 import React, { useEffect, useState } from "react";
 import "./Component.css";
-import { io } from "socket.io-client";
 import socket from "../socket";
+import Countdown from "./Countdown";
 
-function Piano() {
-  const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
+interface Props {
+  room: string;
+}
 
-  // Notes clicking
-  const [notelist, setNotelist] = useState<{ id: number; note: string }[]>(
-    []
-  );
-  const handleClickNote = (item: string) => {
-    const newNote = { id: notelist.length, note: item };
-    setNotelist([...notelist, newNote]); //Add in array
-  };
+function Piano({room}: Props) {
+    const allnotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    const [notelist, setNotelist] = useState<{id: number, note: string}[]>([]);
+    const [myTurn, setMyTurn] = useState(true);
 
-  useEffect(() => {
-    console.log("A note added", notelist);
-  }, [notelist]);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
+    
+    const [score, setScore] = useState(0);
+    
+    const [notelistReceived, setNotelistReceived] = useState<{id: number, note: string}[]>([]);
 
-  // Socket event for sending notes
-  const sendNotelist = () => {
-    console.log("Notelist is sent", notelist);
-    // socket.emit("send_notelist", { notelist, room });
-  };
+    // Click note
+    const handleClickNote = (item: string) => {
+        const newNote = {id: notelist.length, note:item};
+        setNotelist([...notelist, newNote]); //Add in array
+    };
 
-  /// Timer for sending notes
-  const [secondsLeft, setSecondsLeft] = useState(10);
+    useEffect(() => {
+        console.log("A note added", notelist)
+    }, [notelist])
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSecondsLeft((prevSecondsLeft) => {
-        if (prevSecondsLeft === 1) {
-          // sendNotelist();
-          clearInterval(timer);
-          return 0;
-        }
-        return prevSecondsLeft - 1;
-      });
-    }, 1000);
+    // First Player can start creating pattern
+    const handleStart = () => {
+        console.log("P1 start");
+        setNotelist([]);
+        setIsCreating(true);
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    // Socket event for sending notes
+    const sendNotelist = () => {
+        console.log("Notelist is sent", { room, notelist: notelist })
+        socket.emit("send_notelist", { room, notelist: notelist });
+    };
 
-  useEffect(() => {
-    if (secondsLeft === 0) {
-      sendNotelist();
-      setNotelist([]);
-    }
-  }, [secondsLeft]);
+    // Socket event for receiving notes
+    useEffect(() => {
+        socket.on("receive_notelist", (data) => {
+            setNotelistReceived(data.notelist);
+            console.log("receive_notelist", data);
+            setIsFollowing(true);
+            setNotelist([]);
+        });
+    }, [socket]);
 
-  // Received notes
-  const [notelistReceived, setNotelistReceived] = useState<
-    { id: number; note: string }[]
-  >([]);
+    // Scoring
+    const checkNotelist = (arrayReceived: {id: number, note: string}[], arraySubmit: {id: number, note: string}[]) => {
+        const minLenght = Math.min(arrayReceived.length, arraySubmit.length);
+        console.log("checkNotelist", arrayReceived, arraySubmit, minLenght);
 
-  useEffect(() => {
-    socket.on("receive_notelist", (data) => {
-      setNotelistReceived(data);
-      console.log("receive_notelist", data);
-      setSecondsLeft(20);
-      setNotelist([]);
-    });
-  }, [socket]);
+        let updatedScore = score;
 
-  return (
-    <>
-      <h1>Seconds Left: {secondsLeft}</h1>
+        for (let i = 0; i < minLenght; i++) {
+            if (arrayReceived[i].id === arraySubmit[i].id && arrayReceived[i].note === arraySubmit[i].note) {
+                updatedScore++;
+            }
+        };
 
-      <h1>Piano</h1>
-      <div className="piano-container">
-        {allnotes.map((item) => (
-          <div
-            key={item}
-            onClick={() => {
-              handleClickNote(item);
-            }}
-          >
-            {item}
-          </div>
-        ))}
-      </div>
+        setScore(updatedScore);
+    };
 
-      <h1>Display</h1>
-      <div className="piano-container">
-        {notelist.map((item) => (
-          <div key={item.id}>{item.note}</div>
-        ))}
-      </div>
+    return (
+        <>
+            <div className='piano-container'>
+            {allnotes.map((item) => (
+                <div key={item} onClick={() => {handleClickNote(item);}}>
+                    {item}
+                </div>
+            ))}
+            </div>
+            
+            <button onClick={handleStart}>Start</button>
+            <p>Create a pattern:</p> 
+            <Countdown duration={10} running={isCreating} onTimeout={() => sendNotelist()} />
+            <p></p>
+            
+            <h1>Display</h1>
+            <div className='piano-container'>
+                {notelist.map((item) => (
+                    <div key={item.id}>{item.note}</div>
+                ))}
+            </div>
 
-      <h1>Received</h1>
-      <div className="piano-container">
-        {notelistReceived.map((item) => (
-          <div key={item.id}>{item.note}</div>
-        ))}
-      </div>
-    </>
-  );
+            <p>Follow the pattern: </p>
+            <Countdown duration={20} running={isFollowing} onTimeout={() => checkNotelist(notelistReceived, notelist)} />
+
+            <h1>Received</h1>
+            <div className='piano-container'>
+                {notelistReceived.map((item) => (
+                    <div key={item.id}>{item.note}</div>
+                ))}
+            </div>
+
+            <p>score: {score}</p>
+        </>
+    );
 }
 
 export default Piano;

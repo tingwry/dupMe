@@ -12,8 +12,8 @@ import User from "./components/User";
 function App() {
   return (
     <div className="App">
-      <JoinRoom />
       <User />
+      {/* <Piano /> */}
     </div>
   );
 }

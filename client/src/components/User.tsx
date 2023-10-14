@@ -1,10 +1,9 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import socket from '../socket';
-import PianoP1 from './PianoP1';
-import PianoP2 from './PianoP2';
+import JoinRoom from './JoinRoom';
 
 function User() {
-    const [users, setUsers] = useState<{id: number, name: string}[]>([]);
+    const [users, setUsers] = useState<{id: string, name: string, room: string}[]>([]);
     const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
     const [name, setName] = useState<string>("");
 
@@ -42,10 +41,9 @@ function User() {
             <h2>{name}</h2>
             <h3>Current players: {users.length}</h3>
             {users.map((item) => (
-                <div key={item.id}>{item.id}, {item.name}</div>
+                <div key={item.id}>{item.id}, {item.name}, {item.room}</div>
             ))}
-            <PianoP1 />
-            <PianoP2 />
+            <JoinRoom />
         </> ) : ( <>
             <input 
                 type='text'
