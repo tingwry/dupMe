@@ -9,7 +9,9 @@ function JoinRoom() {
   // Join room
   const [room, setRoom] = useState("");
   const [enteredRoom, setEnteredRoom] = useState(false);
-  const [playersInRoom, setPlayersInRoom] = useState<{id: string, name: string, room: string}[]>([]);
+  const [playersInRoom, setPlayersInRoom] = useState<
+    { sid: string; name: string; room: string }[]
+  >([]);
 
   const joinRoom = () => {
     if (room !== "") {
@@ -41,12 +43,14 @@ function JoinRoom() {
         <>
           <p>room: {room}</p>
           {playersInRoom.map((item) => (
-              <div key={item.id}>{item.id}, {item.name}, {item.room}</div>
+            <div key={item.sid}>
+              {item.sid}, {item.name}, {item.room}
+            </div>
           ))}
 
-        {/* <PianoCreate room={room} />
+          {/* <PianoCreate room={room} />
         <PianoFollow room={room}/> */}
-        <Piano room={room}/>
+          <Piano room={room} />
         </>
       )}
     </>

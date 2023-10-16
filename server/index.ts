@@ -2,6 +2,7 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import { Server } from "socket.io";
+import console from "console";
 
 const app = express();
 app.use(cors());
@@ -59,10 +60,11 @@ io.on("connection", (socket) => {
         // Update the room property for the user in the users array
         const user = users.find((user) => user.sid === socket.id);
         const player = {sid: user?.sid || "", name: user?.name || "", score: 0, P1: false, round: 0}
-        const foundRoom = rooms.find((room) => room.roomId === data)
+        let foundRoom = rooms.find((room) => room.roomId === data)
         if (foundRoom) {
             foundRoom.players.push(player)
         } else {
+            foundRoom = {roomId: data, players:[player]}
             rooms.push({roomId: data, players:[player]})
         }
 
@@ -110,16 +112,41 @@ io.on("connection", (socket) => {
     })
 
     socket.on("end_turn", (data) => {
-        console.log(`end_turn: ${data}`)
+        io.to("room").emit(`score: ${data.finalScore}`);
         // set score
+        const foundRoom = rooms.find((room) => room.roomId === data.room)
+        let player = foundRoom?.players.find((player) => player.sid === socket.id);
+
+        if (foundRoom && player) {
+            player.score = data.finalScore;
+        }
+        console.log(player);
     })
 
     socket.on("end_round", (data) => {
         // set score
-        io.to("room").emit("scores of both players in this round", "scores whatever");
+        io.to("room").emit(`score: ${data.finalScore}`);
+
+        const foundRoom = rooms.find((room) => room.roomId === data.room)
+        let player = foundRoom?.players.find((player) => player.sid === socket.id);
+
+        if (foundRoom && player) {
+            player.score = data.finalScore;
+        }
+        console.log(player);
     })
 
+    socket.on("find_winner", (data) => {
+        const foundRoom = rooms.find((room) => room.roomId === data)
 
+        if (foundRoom && foundRoom.players[0] && foundRoom.players[1]) {
+            const maxScore = Math.max(foundRoom.players[0].score, foundRoom.players[1].score);
+            console.log("max score:", maxScore);
+        } else {
+            console.log("there's some errorrrrrr");
+        }
+        
+    })
 
     // -------------------------------------
 })
