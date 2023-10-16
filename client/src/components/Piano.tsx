@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Component.css";
-import socket from "../socket";
 import Countdown from "./Countdown";
+import socket from "../socket";
 
 interface Props {
   room: string;
@@ -10,14 +10,14 @@ interface Props {
 function Piano({room}: Props) {
     const allnotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const [notelist, setNotelist] = useState<{id: number, note: string}[]>([]);
-    const [myTurn, setMyTurn] = useState(true);
+
+    const [isP1, setIsP1] = useState(false); //mod1
 
     const [isFollowing, setIsFollowing] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     
-    const [score, setScore] = useState(0);
-    
     const [notelistReceived, setNotelistReceived] = useState<{id: number, note: string}[]>([]);
+    const [score, setScore] = useState(0);
 
     // Click note
     const handleClickNote = (item: string) => {
@@ -31,19 +31,25 @@ function Piano({room}: Props) {
 
     // First Player can start creating pattern
     const handleStart = () => {
-        console.log("P1 start");
         setNotelist([]);
         setIsCreating(true);
+        setIsP1(true);
     };
 
     // Socket event for sending notes
     const sendNotelist = () => {
-        console.log("Notelist is sent", { room, notelist: notelist })
+        console.log("Notelist is sent", { room, notelist: notelist });
         socket.emit("send_notelist", { room, notelist: notelist });
     };
 
-    // Socket event for receiving notes
+    // Socket event for
     useEffect(() => {
+        // Starting the round after both are ready
+        socket.on("start_round", (data) => {
+            
+        })
+
+        // Receiving notes
         socket.on("receive_notelist", (data) => {
             setNotelistReceived(data.notelist);
             console.log("receive_notelist", data);
@@ -66,6 +72,13 @@ function Piano({room}: Props) {
         };
 
         setScore(updatedScore);
+
+        if (isP1) {
+            socket.emit("end_round", "this round ends");
+        } else {
+            socket.emit("end_turn", "this turn ends");
+            setIsCreating(true)
+        }
     };
 
     return (
@@ -78,6 +91,10 @@ function Piano({room}: Props) {
             ))}
             </div>
             
+            {/* countdown 3 sec before the turn start */}
+            {/* <p>Starting in: </p>
+            <Countdown duration={3} running={isCurrentPlayer} onTimeout={() => {setIsCreating(true)}} /> */}
+            
             <button onClick={handleStart}>Start</button>
             <p>Create a pattern:</p> 
             <Countdown duration={10} running={isCreating} onTimeout={() => sendNotelist()} />
@@ -89,7 +106,7 @@ function Piano({room}: Props) {
                     <div key={item.id}>{item.note}</div>
                 ))}
             </div>
-
+            <p>Waiting for ... to create a pattern</p>
             <p>Follow the pattern: </p>
             <Countdown duration={20} running={isFollowing} onTimeout={() => checkNotelist(notelistReceived, notelist)} />
 
