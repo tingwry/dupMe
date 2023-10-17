@@ -3,7 +3,7 @@ import socket from '../socket';
 import JoinRoom from './JoinRoom';
 
 function User() {
-    const [users, setUsers] = useState<{id: string, name: string, room: string}[]>([]);
+    const [users, setUsers] = useState<{sid: string, name: string, roomId: string, score: number}[]>([]);
     const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
     const [name, setName] = useState<string>("");
 
@@ -19,7 +19,6 @@ function User() {
 
     useEffect(() => {
         socket.on("users", (data) => {
-            console.log("users", data);
             setUsers(data);
         });
 
@@ -41,7 +40,7 @@ function User() {
             <h2>{name}</h2>
             <h3>Current players: {users.length}</h3>
             {users.map((item) => (
-                <div key={item.id}>{item.id}, {item.name}, {item.room}</div>
+                <div key={item.sid}>{item.sid}, {item.name}, {item.roomId}, {item.score}</div>
             ))}
             <JoinRoom />
         </> ) : ( <>
@@ -52,8 +51,7 @@ function User() {
                 placeholder='Enter your name'
             />
             <button onClick={handleSubmitName}>Submit</button>
-        </> )}
-        </div>
+        </> )}</div>
         </>
     )
 }
