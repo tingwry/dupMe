@@ -1,58 +1,82 @@
 import React, { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import socket from "../socket";
-import PianoCreate from "./PianoCreate";
-import PianoFollow from "./PianoFollow";
 import Piano from "./Piano";
+import "./Component.css";
 
 function JoinRoom() {
   // Join room
-  const [room, setRoom] = useState("");
+  const [rooms, setRooms] = useState<
+    { roomId: string; players: { sid: string }[] }[]
+  >([]);
+  const [roomId, setRoomId] = useState("");
   const [enteredRoom, setEnteredRoom] = useState(false);
   const [playersInRoom, setPlayersInRoom] = useState<
-    { sid: string; name: string; room: string }[]
+    { sid: string; name: string; roomId: string; score: number }[]
   >([]);
 
   const joinRoom = () => {
-    if (room !== "") {
-      socket.emit("join_room", room);
+    if (roomId !== "") {
+      socket.emit("join_room", roomId);
       setEnteredRoom(true);
-      console.log("join_room", room);
+      console.log("join_room", roomId);
     }
   };
 
+  const handleClickRoom = (item: string) => {
+    socket.emit("join_room", item);
+    setEnteredRoom(true);
+    console.log("join_room", item);
+    setRoomId(item);
+  };
+
   useEffect(() => {
+    socket.on("rooms", (data) => {
+      setRooms(data);
+    });
     socket.on("players_in_room", (data) => {
       setPlayersInRoom(data);
-      console.log("players_in_room", data);
     });
   }, [socket]);
 
   return (
     <>
       <h1>JoinRoom</h1>
-      <input
-        placeholder="Room Number..."
-        onChange={(event) => {
-          setRoom(event.target.value);
-        }}
-      />
-      <button onClick={joinRoom}> Join Room</button>
-
-      {enteredRoom && (
-        <>
-          <p>room: {room}</p>
-          {playersInRoom.map((item) => (
-            <div key={item.sid}>
-              {item.sid}, {item.name}, {item.room}
+      <div>
+        {enteredRoom ? (
+          <>
+            <p>room: {roomId}</p>
+            {playersInRoom.map((item) => (
+              <div key={item.sid}>
+                {item.sid}, {item.name}
+              </div>
+            ))}
+            <button>leave this room</button>
+            <Piano roomId={roomId} />
+          </>
+        ) : (
+          <>
+            {/* <input
+                placeholder="Room Number..."
+                onChange={(event) => {
+                setRoom(event.target.value);
+                }}
+            />
+            <button onClick={joinRoom}> Join Room</button> */}
+            <div className="rooms-container">
+              {rooms.map((item) => (
+                <div
+                  key={item.roomId}
+                  onClick={() => {
+                    handleClickRoom(item.roomId);
+                  }}
+                >
+                  {item.roomId}
+                </div>
+              ))}
             </div>
-          ))}
-
-          {/* <PianoCreate room={room} />
-        <PianoFollow room={room}/> */}
-          <Piano room={room} />
-        </>
-      )}
+          </>
+        )}
+      </div>
     </>
   );
 }
