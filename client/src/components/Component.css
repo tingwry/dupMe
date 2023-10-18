@@ -17,11 +17,17 @@
 }
 
 .piano-container > div:hover {
-    background-color: DodgerBlue;
-    color: white;
     cursor: pointer;
 
 }
+
+.piano-container > div:active {
+    background-color: DodgerBlue;
+    color: white;
+
+}
+
+
 
 .rooms-container {
     display: flex;
