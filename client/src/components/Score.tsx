@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Piano from "./Piano";
-import User from "./User";
-import { io } from "socket.io-client";
 import socket from "../socket";
 
-function Score(props: any) {
+function Score() {
   const [users, setUsers] = useState<
     { sid: string; name: string; roomId: string; score: number }[]
   >([]);
@@ -41,14 +38,3 @@ function Score(props: any) {
 }
 
 export default Score;
-
-// function Score(props: any) {
-//   return (
-//     <div>
-//       <h1>Current Scores</h1>
-//       <p>Player 1: {props.score.player1}</p>
-//       <p>Player 2: {props.score.player2}</p>
-//       <h1>The winner is {winner} </h1>
-//     </div>
-//   );
-// }
