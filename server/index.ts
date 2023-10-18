@@ -87,18 +87,18 @@ io.on("connection", (socket) => {
             users[userIndex].roomId = data;
         }
 
-        console.log(users)
-        const player = {sid: socket.id}
-        let foundRoom = rooms.find((room) => room.roomId === data)
-        if (foundRoom) {
-            foundRoom.players.push(player)
-        } else {
-            foundRoom = {roomId: data, players:[player]}
-            rooms.push(foundRoom)
-        }
+        // console.log(users)
+        // const player = {sid: socket.id}
+        // let foundRoom = rooms.find((room) => room.roomId === data)
+        // if (foundRoom) {
+        //     foundRoom.players.push(player)
+        // } else {
+        //     foundRoom = {roomId: data, players:[player]}
+        //     rooms.push(foundRoom)
+        // }
 
-        console.log("rooms: ");
-        console.log(rooms);
+        // console.log("rooms: ");
+        // console.log(rooms);
 
         // Send the list of players in the room to the client who entered the room
         const playersInRoom = users.filter((user) => user.roomId === data);
@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on("end_game", (data) => {
-        // console.log(`end_game: ${data}`)
+        console.log(`end_game: ${data}`)
         // set score
 
         // io.to("room").emit(`score: ${data.finalScore}`);
@@ -150,6 +150,13 @@ io.on("connection", (socket) => {
         } else {
             console.log("there's some errorrrrrr");
         }
+
+        // send score + winner to client
+        console.log(users[0].roomId);
+        console.log("winner", winner)
+        io.to(users[0].roomId).emit('users', users);
+        io.to(users[0].roomId).emit('winner', winner);
+
     })
 
     socket.on("end_3_turns", (data) => {

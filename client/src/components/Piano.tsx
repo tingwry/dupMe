@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Component.css";
 import Countdown from "./Countdown";
 import socket from "../socket";
+import Score from "./Score";
 
 interface Props {
   roomId: string;
@@ -27,6 +28,8 @@ function Piano({ roomId }: Props) {
     { id: number; note: string }[]
   >([]);
   const [score, setScore] = useState(0);
+
+  const [gameEnded, setGameEnded] = useState(false);
 
   // Click note
   const handleClickNote = (item: string) => {
@@ -110,6 +113,7 @@ function Piano({ roomId }: Props) {
     if (isP1) {
       if (round === 2) {
         socket.emit("end_game", updatedScore);
+        setGameEnded(true);
       } else {
         socket.emit("end_round", { roomId: roomId, round: round });
         setRound(round + 1);
@@ -143,6 +147,7 @@ function Piano({ roomId }: Props) {
       {/* countdown 3 sec before the turn start */}
       {/* <p>Starting in: </p>
             <Countdown duration={3} running={isCurrentPlayer} onTimeout={() => {setIsCreating(true)}} /> */}
+      {gameEnded ? <Score /> : <></>}
 
       <button onClick={handleStart}>Start</button>
       <p>Create a pattern:</p>
