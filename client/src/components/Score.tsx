@@ -47,9 +47,9 @@ function Score() {
 
   return (
     <div>
-      <h1>Current Scores</h1>
       {p1 && p2 && (
         <>
+          <h1>Current Scores</h1>
           <p>
             {p1.name}: {p1.score}
           </p>
