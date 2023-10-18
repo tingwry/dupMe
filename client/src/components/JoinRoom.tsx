@@ -25,7 +25,7 @@ function JoinRoom() {
     };
 
     const handleLeave = () => {
-        socket.emit('leave_room', roomId);
+        socket.emit('leave_room', "roomId");
         setInRoom(false);
         console.log("leave_room");
         setRoomId("main");
@@ -53,7 +53,7 @@ function JoinRoom() {
                           </div>
                       ))}
                       <button onClick={handleLeave}>leave this room</button>
-                      <Piano roomId={roomId} />
+                      <Piano />
                   </> ) : ( <>
                       {/* <input
                           placeholder="Room Number..."

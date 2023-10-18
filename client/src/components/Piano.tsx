@@ -8,7 +8,7 @@ interface Props {
   roomId: string;
 }
 
-function Piano({ roomId }: Props) {
+function Piano() {
   const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
   const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
 
@@ -43,8 +43,8 @@ function Piano({ roomId }: Props) {
 
   // Sending notes
   const sendNotelist = () => {
-    socket.emit("send_notelist", { roomId, notelist: notelist });
-    console.log("Notelist is sent", { roomId, notelist: notelist });
+    socket.emit("send_notelist", { notelist: notelist });
+    console.log("Notelist is sent", { notelist: notelist });
     setNotelist([]);
     setIsCreating(false);
   };

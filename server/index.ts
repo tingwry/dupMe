@@ -24,7 +24,8 @@ const rooms: {roomId: string, round: number}[] = [
     {roomId: "room 5", round: 1},
 ]
 
-io.on("connection", (socket) => {
+
+io.on('connection', (socket) => {  
     // Connection -------------------------------------
     console.log(`Boombayah welcome: ${socket.id}`)
 
@@ -77,26 +78,28 @@ io.on("connection", (socket) => {
     });
 
     socket.on('leave_room', (data) => {
-        socket.leave(data);
-        console.log(`${socket.id} leave_room ${data}`);
-
-        // /Update the room property for the user in the users array
-        const userIndex = users.findIndex((user) => user.sid === socket.id);
+        const userIndex = users.findIndex((user) => user.sid === socket.id);       
         if (userIndex !== -1) {
-            users[userIndex].roomId = "main";
+            const previousRoomId = users[userIndex].roomId;
+
+            socket.leave(previousRoomId);
+            users[userIndex].roomId = "main"; // Update the room property for the user in the users array
+            
+            // Send the list of players in the room to the client who entered the room
+            const playersInRoom = users.filter((user) => user.roomId === previousRoomId);
+
+            // Broadcasting the list of players in the room to all users in the server and the room
+            io.to(previousRoomId).emit('players_in_room', playersInRoom);
+            io.emit('users', users);
+
+            console.log(`${socket.id} leave_room ${previousRoomId}`);    
         }
-
-        // Send the list of players in the room to the client who entered the room
-        const playersInRoom = users.filter((user) => user.roomId === data);
-
-        // Broadcasting the list of players in the room to all users in the server and the room
-        io.to(data).emit('players_in_room', playersInRoom);
-        io.emit('users', users);
     })
     // -------------------------------------
 
     // Game -------------------------------------
     socket.on('ready', (data) => {
+        // data = "this player is ready" -> could add some motto
         console.log(data, socket.id);
 
         const userIndex = users.findIndex((user) => user.sid === socket.id);
@@ -123,10 +126,15 @@ io.on("connection", (socket) => {
     }})
 
     socket.on('send_notelist', (data) => {
-        console.log("receive_notelist")
-        // socket.to sends the event to all sockets in the specified room, but it does not include the current socket.
-        // io.to send the event to all sockets in the specified room, regardless of the namespace.
-        socket.to(data.roomId).emit("receive_notelist", data);
+        const userIndex = users.findIndex((user) => user.sid === socket.id);
+        if (userIndex !== -1) {
+            const roomId = users[userIndex].roomId;
+
+            // socket.to sends the event to all sockets in the specified room, but it does not include the current socket.
+            // io.to send the event to all sockets in the specified room, regardless of the namespace.
+            socket.to(roomId).emit("receive_notelist", roomId);
+            console.log("receive_notelist")
+        }
     });
 
     socket.on('end_turn', (data) => {
@@ -144,107 +152,141 @@ io.on("connection", (socket) => {
         const userIndex = users.findIndex((user) => user.sid === socket.id);
         if (userIndex !== -1) {
             users[userIndex].score = users[userIndex].score + addScore;
+            console.log(`${users[userIndex].name} add ${addScore} = ${users[userIndex].score}`);
         }
-        console.log(`${users[userIndex].name} add ${addScore} = ${users[userIndex].score}`);
 
         const roomId = users[userIndex].roomId;
         const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
-        // If is P1
-        if (users[userIndex].P1) {
-            // Round 2 = end game
-            if (rooms[roomIndex].round === 2) {
-                console.log('end_game');
-                // io.to(users[userIndex].roomId).emit('')
+
+        if (users[userIndex].P1) { // If is P1
+            if (rooms[roomIndex].round === 2) { // Round 2 = end game
+                console.log(`end_game ${roomId}`);
+                const playersInRoom = users.filter((user) => user.roomId === roomId);
+
+                // find winner
+                let winner = playersInRoom[0];
+                let tie = false;
+
+                if (playersInRoom[0] && playersInRoom[1]) {
+                    // check if tie
+                    if (playersInRoom[0].score === playersInRoom[1].score) {
+                        tie = true;
+                        console.log("this match is a tie");
+
+                        // send score + winner to client
+
+                        io.to(roomId).emit('p1', playersInRoom[0]);
+                        io.to(roomId).emit('p2', playersInRoom[1]);
+                        io.to(roomId).emit('tie', tie);
+                        io.to(roomId).emit('winner', winner);
+                    } else {
+                        const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
+                        console.log("max score:", maxScore);
+
+                        for (const playerInRoom of playersInRoom) {
+                            if (playerInRoom.score === maxScore) {
+                                winner = playerInRoom;
+                                console.log("winner: ", winner);
+                            }
+                        }
+
+                        // send score + winner to client
+
+                        // console.log(playersInRoom[0].roomId);
+                        console.log("playersInRoom")
+                        console.log(playersInRoom)
+                        
+                        io.to(roomId).emit('p1', playersInRoom[0]);
+                        io.to(roomId).emit('p2', playersInRoom[1]);
+                        io.to(roomId).emit('tie', tie);
+                        io.to(roomId).emit('winner', winner);
+                    }
+                } else {
+                    console.log("there's some errorrrrrr");
+                }
             } else { // Round 1 = continues
                 console.log(`end_round ${rooms[roomIndex].round}`);
                 rooms[roomIndex].round++;
                 io.to(roomId).emit('next_round', {round: rooms[roomIndex].round})
                 io.to(socket.id).emit('start_turn', {round: rooms[roomIndex].round});
             }
-        } else {
+        } else { // is not P1 = always start the next turn
             io.to(socket.id).emit('start_turn', {round: rooms[roomIndex].round});
         }       
     });
 
-    socket.on("end_game", (data) => {
-        console.log(`end_game: ${data}`)
+    // socket.on('end_game', (data) => {
+    //     console.log(`end_game: ${data}`)
 
-        const user = users.find((user) => user.sid === socket.id);
+    //     const user = users.find((user) => user.sid === socket.id);
 
-        if (user) {
-            user.score = data;
-            console.log("score of P1", user.score);
+    //     if (user) {
+    //         user.score = data;
+    //         console.log("score of P1", user.score);
 
-            const roomId = user.roomId;
-            const playersInRoom = users.filter((user) => user.roomId === roomId);
+    //         const roomId = user.roomId;
+    //         const playersInRoom = users.filter((user) => user.roomId === roomId);
 
-            // console.log("playersInRoom");
-            // console.log(playersInRoom);
+    //         // console.log("playersInRoom");
+    //         // console.log(playersInRoom);
 
-            // find winner
-            let winner = playersInRoom[0];
-            console.log(winner);
-            let tie = false;
-            if (playersInRoom[0] && playersInRoom[1]) {
-                // check if tie
-                if (playersInRoom[0].score === playersInRoom[1].score) {
-                    tie = true;
-                    console.log("this match is a tie");
+    //         // find winner
+    //         let winner = playersInRoom[0];
+    //         console.log(winner);
+    //         let tie = false;
+    //         if (playersInRoom[0] && playersInRoom[1]) {
+    //             // check if tie
+    //             if (playersInRoom[0].score === playersInRoom[1].score) {
+    //                 tie = true;
+    //                 console.log("this match is a tie");
 
-                    // send score + winner to client
+    //                 // send score + winner to client
 
-                    io.to(roomId).emit('p1', playersInRoom[0]);
-                    io.to(roomId).emit('p2', playersInRoom[1]);
-                    io.to(roomId).emit('tie', tie);
-                    io.to(roomId).emit('winner', winner);
-                } else {
-                    const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
-                    console.log("max score:", maxScore);
+    //                 io.to(roomId).emit('p1', playersInRoom[0]);
+    //                 io.to(roomId).emit('p2', playersInRoom[1]);
+    //                 io.to(roomId).emit('tie', tie);
+    //                 io.to(roomId).emit('winner', winner);
+    //             } else {
+    //                 const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
+    //                 console.log("max score:", maxScore);
 
-                    for (const playerInRoom of playersInRoom) {
-                        if (playerInRoom.score === maxScore) {
-                            winner = playerInRoom;
-                            console.log("winner: ", winner);
-                        }
-                    }
+    //                 for (const playerInRoom of playersInRoom) {
+    //                     if (playerInRoom.score === maxScore) {
+    //                         winner = playerInRoom;
+    //                         console.log("winner: ", winner);
+    //                     }
+    //                 }
 
-                    // send score + winner to client
+    //                 // send score + winner to client
 
-                    // console.log(playersInRoom[0].roomId);
-                    console.log("playersInRoom")
-                    console.log(playersInRoom)
+    //                 // console.log(playersInRoom[0].roomId);
+    //                 console.log("playersInRoom")
+    //                 console.log(playersInRoom)
                     
-                    io.to(roomId).emit('p1', playersInRoom[0]);
-                    io.to(roomId).emit('p2', playersInRoom[1]);
-                    io.to(roomId).emit('tie', tie);
-                    io.to(roomId).emit('winner', winner);
-                }
-            } else {
-                console.log("there's some errorrrrrr");
-            }
-        }
-    })
+    //                 io.to(roomId).emit('p1', playersInRoom[0]);
+    //                 io.to(roomId).emit('p2', playersInRoom[1]);
+    //                 io.to(roomId).emit('tie', tie);
+    //                 io.to(roomId).emit('winner', winner);
+    //             }
+    //         } else {
+    //             console.log("there's some errorrrrrr");
+    //         }
+    //     }
+    // })
 
-    socket.on("end_3_turns", (data) => {
-        // console.log(`end_game: ${data}`)
-        // set score
+    // socket.on("end_3_turns", (data) => {
+    //     // console.log(`end_game: ${data}`)
+    //     // set score
 
-        // io.to("room").emit(`score: ${data.finalScore}`);
+    //     // io.to("room").emit(`score: ${data.finalScore}`);
 
-        let user = users.find((user) => user.sid === socket.id);
+    //     let user = users.find((user) => user.sid === socket.id);
 
-        if (user) {
-            user.score = data;
-            console.log("score of P2", user.score);
-        }
-    })
-
-    socket.on("end_round", (data) => {
-        // set score
-        io.to(data.roomId).emit("start_round", "next round start!");
-        console.log(data)
-    })
-
+    //     if (user) {
+    //         user.score = data;
+    //         console.log("score of P2", user.score);
+    //     }
+    // })
     // -------------------------------------
 })
 
