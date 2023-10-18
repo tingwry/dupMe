@@ -144,6 +144,7 @@ io.on("connection", (socket) => {
         }
 
         // find winner
+        let winner = users[0];
         if (users[0] && users[1]) {
             const maxScore = Math.max(users[0].score, users[1].score);
             console.log("max score:", maxScore);

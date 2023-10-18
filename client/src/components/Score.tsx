@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import Piano from "./Piano";
 import User from "./User";
 import { io } from "socket.io-client";
-
-const socket = io("http://localhost:3000");
+import socket from "../socket";
 
 function Score(props: any) {
   const [users, setUsers] = useState<
@@ -30,12 +29,12 @@ function Score(props: any) {
   return (
     <div>
       <h1>Current Scores</h1>
-      {/* <p>
+      <p>
         {users[0].name}: {users[0].score}
       </p>
       <p>
         {users[1].name}: {users[1].score}
-      </p> */}
+      </p>
       {winner && <h1>The winner is {winner.name}</h1>}
     </div>
   );
