@@ -15,16 +15,13 @@ const io = new Server(server, {
     }
 })
 
-// Conection
 const users: {sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[] = [];
-
-// Join a room
-const rooms: {roomId: string, players:{sid: string}[]}[] = [
-    {roomId: "room 1", players: []},
-    {roomId: "room 2", players: []},
-    {roomId: "room 3", players: []},
-    {roomId: "room 4", players: []},
-    {roomId: "room 5", players: []},
+const rooms: {roomId: string, round: number}[] = [
+    {roomId: "room 1", round: 1},
+    {roomId: "room 2", round: 1},
+    {roomId: "room 3", round: 1},
+    {roomId: "room 4", round: 1},
+    {roomId: "room 5", round: 1},
 ]
 
 io.on("connection", (socket) => {
@@ -51,32 +48,18 @@ io.on("connection", (socket) => {
             const roomId = users[userIndex].roomId;
             users.splice(userIndex, 1);
 
-            // Remove the user from the corresponding room in the rooms array
-            const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
-            if (roomIndex !== -1) {
-                const playerIndex = rooms[roomIndex].players.findIndex((player) => player.sid === socket.id);
-                if (playerIndex !== -1) {
-                    rooms[roomIndex].players.splice(playerIndex, 1);
-                }
-            }
             const playersInRoom = users.filter((user) => user.roomId === roomId);
-            console.log(`players in room ${roomId} =`)
-            console.log(playersInRoom)
 
-            // // Broadcasting the list of players in the room to all users in the room
+            // Broadcasting the list of players in the room to all users in the room
             io.to(roomId).emit('players_in_room', playersInRoom);
         }
-        console.log("users: ");
-        console.log(users);
-        console.log("rooms: ");
-        console.log(rooms);
 
         // Send the updated list of connected users to all clients
         io.emit('users', users);
     });
     // -------------------------------------
 
-    // Join a room -------------------------------------
+    // Room -------------------------------------
     socket.on("join_room", (data) => {
         socket.join(data);
         console.log(`${socket.id} join_room ${data}`);
@@ -87,28 +70,32 @@ io.on("connection", (socket) => {
             users[userIndex].roomId = data;
         }
 
-        // console.log(users)
-        // const player = {sid: socket.id}
-        // let foundRoom = rooms.find((room) => room.roomId === data)
-        // if (foundRoom) {
-        //     foundRoom.players.push(player)
-        // } else {
-        //     foundRoom = {roomId: data, players:[player]}
-        //     rooms.push(foundRoom)
-        // }
+        // Send the list of players in the room to the client who entered the room
+        const playersInRoom = users.filter((user) => user.roomId === data);
 
-        // console.log("rooms: ");
-        // console.log(rooms);
+        // Broadcasting the list of players in the room to all users in the server and the room
+        io.to(data).emit('players_in_room', playersInRoom);
+        io.emit('users', users);
+    });
+
+    socket.on('leave_room', (data) => {
+        socket.leave(data);
+        console.log(`${socket.id} leave_room ${data}`);
+
+        // /Update the room property for the user in the users array
+        const userIndex = users.findIndex((user) => user.sid === socket.id);
+        if (userIndex !== -1) {
+            users[userIndex].roomId = "main";
+        }
 
         // Send the list of players in the room to the client who entered the room
         const playersInRoom = users.filter((user) => user.roomId === data);
         console.log(`players in room ${data} =`)
         console.log(playersInRoom)
 
-        // Broadcasting the list of players in the room to all users in the room
+        // Broadcasting the list of players in the room to all users in the server and the room
         io.to(data).emit('players_in_room', playersInRoom);
         io.emit('users', users);
-
     })
     // -------------------------------------
 
@@ -135,18 +122,9 @@ io.on("connection", (socket) => {
                         user.P1 = true;
                     }
                 });
-
                 io.to(firstPlayerSocketId).emit("start_game");
             }
     }})
-
-
-    // if both player ready -> randomize P1
-    // const P1 = true;
-    // const P2 = true;
-    // if (P1 && P2) {
-    //     io.to("P1 socket.id").emit("start_game", "P1 socket.id")
-    // }
 
     socket.on("send_notelist", (data) => {
         console.log("receive_notelist", data)
@@ -214,10 +192,7 @@ io.on("connection", (socket) => {
             } else {
                 console.log("there's some errorrrrrr");
             }
-
-            
         }
-
     })
 
     socket.on("end_3_turns", (data) => {

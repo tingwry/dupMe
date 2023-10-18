@@ -13,21 +13,16 @@
     text-align: center;
     line-height: 75px;
     font-size: 30px;
-
 }
 
 .piano-container > div:hover {
     cursor: pointer;
-
 }
 
 .piano-container > div:active {
     background-color: DodgerBlue;
     color: white;
-
 }
-
-
 
 .rooms-container {
     display: flex;
