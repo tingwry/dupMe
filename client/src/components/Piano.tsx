@@ -23,6 +23,7 @@ function Piano({ roomId }: Props) {
   const [isCreating, setIsCreating] = useState(false);
   const [followDuration, setFollowDuration] = useState(5);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   const [notelistReceived, setNotelistReceived] = useState<
     { id: number; note: string }[]
@@ -36,6 +37,12 @@ function Piano({ roomId }: Props) {
     const newNote = { id: notelist.length, note: item };
     setNotelist([...notelist, newNote]); //Add in array
   };
+
+  // Ready
+  const handleReady = () => {
+    socket.emit('ready', "this player is ready");
+    setIsButtonClicked(true);
+  }
 
   // First Player can start creating pattern
   const handleStart = () => {
@@ -149,7 +156,9 @@ function Piano({ roomId }: Props) {
             <Countdown duration={3} running={isCurrentPlayer} onTimeout={() => {setIsCreating(true)}} /> */}
       {gameEnded ? <Score /> : <></>}
 
-      <button onClick={handleStart}>Start</button>
+      <button onClick={handleReady}
+        className={isButtonClicked ? 'button-clicked' : 'button-default'}>{isButtonClicked ? 'Waiting for the other player to be ready...' : 'Ready'}</button>
+      {/* <button onClick={handleStart}>Start</button> */}
       <p>Create a pattern:</p>
       <Countdown
         key={`create_${countdownKey}`}

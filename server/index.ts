@@ -16,7 +16,7 @@ const io = new Server(server, {
 })
 
 // Conection
-const users: {sid: string, name: string, roomId: string, score: number}[] = [];
+const users: {sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[] = [];
 
 // Join a room
 const rooms: {roomId: string, players:{sid: string}[]}[] = [
@@ -32,7 +32,7 @@ io.on("connection", (socket) => {
     console.log(`Boombayah connected: ${socket.id}`)
 
     socket.on("submit_name", (data) => {
-        const user = {sid: socket.id, name: data, roomId: "main", score: 0};
+        const user = {sid: socket.id, name: data, roomId: "main", score: 0, ready: false, P1: false};
         users.push(user);
         console.log("users: ");
         console.log(users);
@@ -113,15 +113,42 @@ io.on("connection", (socket) => {
 
     // Each game -------------------------------------
     socket.on("ready", (data) => {
-        // player ready
-    })
+        console.log(data, socket.id);
+
+        const userIndex = users.findIndex((user) => user.sid === socket.id);
+        if (userIndex !== -1) {
+            // Mark the user as ready
+            users[userIndex].ready = true;
+
+            // Check if both players in the room are ready
+            const roomId = users[userIndex].roomId;
+            const playersInRoom = users.filter((user) => user.roomId === roomId);
+            const bothPlayersReady = playersInRoom.every((player) => player.ready);
+
+            if (bothPlayersReady) {
+                const firstPlayerSocketId = Math.random() < 0.5 ? playersInRoom[0].sid : playersInRoom[1].sid;
+
+                // update P1 to true for the person who goes first
+                users.forEach((user) => {
+                    if (user.sid === firstPlayerSocketId) {
+                        user.P1 = true;
+                    }
+                });
+
+                io.to(firstPlayerSocketId).emit("start_game");
+            }
+    }})
 
     // if both player ready -> randomize P1
-    const P1 = true;
-    const P2 = true;
-    if (P1 && P2) {
-        io.to("P1 socket.id").emit("start_game", "P1 socket.id")
-    }
+    //const P1 = true;
+    //const P2 = true;
+    //if (P1 && P2) {
+    //    if (Math.random() < 0.5) {
+    //        io.to("P1 socket.id").emit("start_game", "P1 socket.id");
+    //    } else {
+    //        io.to("P2 socket.id").emit("start_game", "P2 socket.id");
+    //    }
+    //}
 
     socket.on("send_notelist", (data) => {
         console.log("receive_notelist", data)
