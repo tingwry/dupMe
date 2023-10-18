@@ -3,9 +3,7 @@ import socket from "../socket";
 import JoinRoom from "./JoinRoom";
 
 function User() {
-  const [users, setUsers] = useState<
-    { sid: string; name: string; roomId: string; score: number }[]
-  >([]);
+  const [users, setUsers] = useState<{sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[]>([]);
   const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
   const [name, setName] = useState<string>("");
 

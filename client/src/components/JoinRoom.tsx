@@ -4,19 +4,18 @@ import Piano from "./Piano";
 import "./Component.css";
 
 function JoinRoom() {
-  // Join room
-  const [rooms, setRooms] = useState<{ roomId: string, round: number }[]>([]);
-  const [roomId, setRoomId] = useState("");
-  const [inRoom, setInRoom] = useState(false);
-  const [playersInRoom, setPlayersInRoom] = useState<{sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[]>([]);
+    const [rooms, setRooms] = useState<{ roomId: string, round: number }[]>([]);
+    const [roomId, setRoomId] = useState("");
+    const [inRoom, setInRoom] = useState(false);
+    const [playersInRoom, setPlayersInRoom] = useState<{sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[]>([]);
 
-  const joinRoom = () => {
-    if (roomId !== "") {
-      socket.emit("join_room", roomId);
-      setInRoom(true);
-      console.log("join_room", roomId);
-    }
-  };
+  // const joinRoom = () => {
+  //   if (roomId !== "") {
+  //     socket.emit("join_room", roomId);
+  //     setInRoom(true);
+  //     console.log("join_room", roomId);
+  //   }
+  // };
 
     const handleJoin = (item: string) => {
         socket.emit('join_room', item);
@@ -41,44 +40,42 @@ function JoinRoom() {
         });
     }, [socket]);
 
-  return (
-    <>
-      <h1>JoinRoom</h1>
-      <div>
-        {inRoom ? (
-          <>
-            <p>room: {roomId}</p>
-            {playersInRoom.map((item) => (
-              <div key={item.sid}>
-                {item.sid}, {item.name}, {item.roomId}, {item.score}
-              </div>
-            ))}
-            <button onClick={handleLeave}>leave this room</button>
-            <Piano roomId={roomId} />
-          </>
-        ) : (
-          <>
-            {/* <input
-                placeholder="Room Number..."
-                onChange={(event) => {
-                setRoom(event.target.value);
-                }}
-            />
-            <button onClick={joinRoom}> Join Room</button> */}
-            <div className="rooms-container">
-              {rooms.map((item) => (
-                <div
-                  key={item.roomId}
-                  onClick={() => {handleJoin(item.roomId);}}
-                >
-                  {item.roomId}
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    </>
+    return (
+        <>
+          <h1>JoinRoom</h1>
+          <div>
+              {inRoom ? ( 
+                  <>
+                      <p>room: {roomId}</p>
+                      {playersInRoom.map((item) => (
+                          <div key={item.sid}>
+                              {item.sid}, {item.name}, {item.roomId}, {item.score}
+                          </div>
+                      ))}
+                      <button onClick={handleLeave}>leave this room</button>
+                      <Piano roomId={roomId} />
+                  </> ) : ( <>
+                      {/* <input
+                          placeholder="Room Number..."
+                          onChange={(event) => {
+                          setRoom(event.target.value);
+                          }}
+                      />
+                      <button onClick={joinRoom}> Join Room</button> */}
+                      <div className="rooms-container">
+                          {rooms.map((item) => (
+                              <div
+                                  key={item.roomId}
+                                  onClick={() => {handleJoin(item.roomId);}}
+                              >
+                                  {item.roomId}
+                              </div>
+                          ))}
+                      </div>
+                </>
+              )}
+          </div>
+      </>
   );
 }
 

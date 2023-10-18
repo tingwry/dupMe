@@ -12,23 +12,16 @@ function Piano({ roomId }: Props) {
   const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
   const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
 
-  const [isP1, setIsP1] = useState(false); //mod1
   const [round, setRound] = useState(1);
   const [P2Ends, setP2Ends] = useState(0);
 
-  // const [isReady, setIsReady] = useState(false)
-  // const [readyDuration, setReadyDuration] = useState(3);
-  const [countdownKey, setCountdownKey] = useState(0);
   const [createDuration, setCreateDuration] = useState(5);
   const [isCreating, setIsCreating] = useState(false);
   const [followDuration, setFollowDuration] = useState(5);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
 
-  const [notelistReceived, setNotelistReceived] = useState<
-    { id: number; note: string }[]
-  >([]);
-  const [score, setScore] = useState(0);
+  const [notelistReceived, setNotelistReceived] = useState<{ id: number; note: string }[]>([]);
 
   // Click note
   const handleClickNote = (item: string) => {
@@ -44,17 +37,14 @@ function Piano({ roomId }: Props) {
 
   // First Player can start creating pattern
   const handleStart = () => {
-    setIsP1(true);
+    // setIsP1(true);
     setNotelist([]);
-    // setReadyDuration(3);
-    // setIsReady(true);
   };
 
-  // Socket event for sending notes
+  // Sending notes
   const sendNotelist = () => {
     socket.emit("send_notelist", { roomId, notelist: notelist });
     console.log("Notelist is sent", { roomId, notelist: notelist });
-
     setNotelist([]);
     setIsCreating(false);
   };
@@ -63,140 +53,139 @@ function Piano({ roomId }: Props) {
   useEffect(() => {
     // Starting the game after both are ready
     socket.on("start_game", (data) => {
-      setIsP1(true);
+      setIsCreating(true);
       setNotelist([]);
-      // setReadyDuration(3);
-      // setIsReady(true);
     });
 
-    socket.on("start_round", (data) => {
+    socket.on('start_turn', (data) => {
       setNotelist([]);
-      // setReadyDuration(3);
-      setCountdownKey(countdownKey + 1);
-      // setIsReady(true);
-      setIsCreating(false);
-      setIsFollowing(false);
+      setIsCreating(true);
+    })
 
-      console.log("start_round", data);
-    });
+    socket.on('next_round', (data) =>{
+      setRound(data.round);
+    })
 
     // Receiving notes
     socket.on("receive_notelist", (data) => {
       setNotelist([]);
       setNotelistReceived(data.notelist);
       console.log("receive_notelist", data);
-      // setReadyDuration(3);
-      // setIsReady(true);
       setIsFollowing(true);
     });
   }, [socket]);
 
-  // Scoring
-  const checkNotelist = (
-    arrayReceived: { id: number; note: string }[],
-    arraySubmit: { id: number; note: string }[]
-  ) => {
-    const minLenght = Math.min(arrayReceived.length, arraySubmit.length);
-    console.log("checkNotelist", arrayReceived, arraySubmit, minLenght);
-
-    let updatedScore = score;
-
-    for (let i = 0; i < minLenght; i++) {
-      if (
-        arrayReceived[i].id === arraySubmit[i].id &&
-        arrayReceived[i].note === arraySubmit[i].note
-      ) {
-        updatedScore++;
-      }
-    }
-
-    setScore(updatedScore);
+  const endTurn = (arrayReceived: {id: number, note: string}[], arraySubmit: {id: number, note: string}[]) => {
+    socket.emit('end_turn', {arrayReceived: arrayReceived, arraySubmit: arraySubmit});
     setIsFollowing(false);
-
-    setP2Ends(P2Ends + 1);
-
-    if (isP1) {
-      if (round === 2) {
-        socket.emit("end_game", updatedScore);
-      } else {
-        socket.emit("end_round", { roomId: roomId, round: round });
-        setRound(round + 1);
-      }
-    } else {
-      console.log("this turn ends");
-      setNotelist([]);
-      setIsCreating(true);
-
-      if (P2Ends === 1) {
-        socket.emit("end_3_turns", updatedScore);
-      }
-    }
   };
 
-  return (
-    <>
-      <div className="piano-container">
-        {allnotes.map((item) => (
-          <div
-            key={item}
-            onClick={() => {
-              handleClickNote(item);
-            }}
-          >
-            {item}
-          </div>
-        ))}
-      </div>
+  // Scoring
+  // const checkNotelist = (
+  //   arrayReceived: { id: number; note: string }[],
+  //   arraySubmit: { id: number; note: string }[]
+  // ) => {
+  //   const minLenght = Math.min(arrayReceived.length, arraySubmit.length);
+  //   console.log("checkNotelist", arrayReceived, arraySubmit, minLenght);
 
-      {/* countdown 3 sec before the turn start */}
-      {/* <p>Starting in: </p>
-            <Countdown duration={3} running={isCurrentPlayer} onTimeout={() => {setIsCreating(true)}} /> */}
-      <Score />
+  //   let updatedScore = score;
 
-      <button
-        onClick={handleReady}
-        className={isButtonClicked ? "button-clicked" : "button-default"}
-      >
-        {isButtonClicked
-          ? "Waiting for the other player to be ready..."
-          : "Ready"}
-      </button>
-      {/* <button onClick={handleStart}>Start</button> */}
-      <p>Create a pattern:</p>
-      <Countdown
-        key={`create_${countdownKey}`}
-        duration={createDuration}
-        running={isCreating || isP1}
-        onTimeout={() => sendNotelist()}
-      />
-      <p></p>
+  //   for (let i = 0; i < minLenght; i++) {
+  //     if (
+  //       arrayReceived[i].id === arraySubmit[i].id &&
+  //       arrayReceived[i].note === arraySubmit[i].note
+  //     ) {
+  //       updatedScore++;
+  //     }
+  //   }
 
-      <h1>Display</h1>
-      <div className="piano-container">
-        {notelist.map((item) => (
-          <div key={item.id}>{item.note}</div>
-        ))}
-      </div>
-      <p>Waiting for ... to create a pattern</p>
+  //   setScore(updatedScore);
+  //   setIsFollowing(false);
 
-      <p>Follow the pattern: </p>
-      <Countdown
-        key={`follow_${countdownKey}`}
-        duration={followDuration}
-        running={isFollowing}
-        onTimeout={() => checkNotelist(notelistReceived, notelist)}
-      />
+  //   setP2Ends(P2Ends + 1);
 
-      <h1>Received</h1>
-      <div className="piano-container">
-        {notelistReceived.map((item) => (
-          <div key={item.id}>{item.note}</div>
-        ))}
-      </div>
+  //   if (isP1) {
+  //     if (round === 2) {
+  //       socket.emit("end_game", updatedScore);
+  //     } else {
+  //       socket.emit("end_round", { roomId: roomId, round: round });
+  //       setRound(round + 1);
+  //     }
+  //   } else {
+  //     console.log("this turn ends");
+  //     setNotelist([]);
+  //     setIsCreating(true);
 
-      <p>score: {score}</p>
-    </>
-  );
+  //     if (P2Ends === 1) {
+  //       socket.emit("end_3_turns", updatedScore);
+  //     }
+  //   }
+  // };
+
+    return (
+        <>
+            <div className="piano-container">
+                {allnotes.map((item) => (
+                    <div
+                        key={item}
+                        onClick={() => {handleClickNote(item);}}
+                    >
+                        <div>{item}</div>
+                    </div>
+                ))}
+            </div>
+            <button onClick={() => {setNotelist([])}}>Clear</button>
+
+            {/* countdown 3 sec before the turn start */}
+            {/* <p>Starting in: </p>
+                  <Countdown duration={3} running={isCurrentPlayer} onTimeout={() => {setIsCreating(true)}} /> */}
+            <Score />
+
+            <button
+                onClick={handleReady}
+                className={isButtonClicked ? "button-clicked" : "button-default"}
+            >
+                {isButtonClicked
+                  ? "Waiting for the other player to be ready..."
+                  : "Ready"}
+            </button>
+            <p>Create a pattern:</p>
+            <Countdown
+                key={`create_${round}`}
+                duration={createDuration}
+                running={isCreating}
+                onTimeout={() => sendNotelist()}
+            />
+            <p></p>
+
+            <h1>Display</h1>
+            <div className="piano-container">
+                {notelist.map((item) => (
+                    <div key={item.id}>
+                        <div>{item.note}</div>
+                    </div>
+                ))}
+            </div>
+            <p>Waiting for ... to create a pattern</p>
+
+            <p>Follow the pattern: </p>
+            <Countdown
+                key={`follow_${round}`}
+                duration={followDuration}
+                running={isFollowing}
+                onTimeout={() => endTurn(notelistReceived, notelist)}
+            />
+
+            <h1>Received</h1>
+            <div className="piano-container">
+                {notelistReceived.map((item) => (
+                    <div key={item.id}>
+                        <div>{item.note}</div>
+                    </div>
+                ))}
+            </div>
+        </>
+    );
 }
 
 export default Piano;

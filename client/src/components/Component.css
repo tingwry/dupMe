@@ -1,18 +1,19 @@
 .piano-container {
     display: flex;
+    flex-direction: row;
     background-color: darkgrey;
 }
 
 .piano-container > div {
-    background-color: #f1f1f1;
+    background-color: white;
+    height: 150px;
+    width: 60px;
+    border: 2px solid black;
+
+    position: relative;
     color: black;
-    width: 50px;
-    height: 75px;
-    padding: 5px;
-    margin: 5px;
-    text-align: center;
-    line-height: 75px;
-    font-size: 30px;
+    font-weight: 600;
+    font-size: 20px;
 }
 
 .piano-container > div:hover {
@@ -22,6 +23,14 @@
 .piano-container > div:active {
     background-color: DodgerBlue;
     color: white;
+}
+
+.piano-container > div > div {
+    position: relative;
+    color: black;
+    font-weight: 400;
+    font-size: 20px;
+    margin-top: 110px;
 }
 
 .rooms-container {
@@ -38,4 +47,10 @@
     margin: 5px;
     text-align: center;
     line-height: 20px;
+}
+
+.rooms-container > div:hover {
+    background-color: DodgerBlue;
+    color: white;
+    cursor: pointer;
 }

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 
 interface Props {
     duration: number;
-    onTimeout: () => void; 
     running: boolean;
+    onTimeout: () => void; 
 }
 
 function Countdown({ duration, running, onTimeout }: Props) {

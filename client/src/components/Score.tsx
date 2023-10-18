@@ -34,16 +34,14 @@ function Score() {
 
     socket.on("winner", (data) => {
       setWinner(data);
-      console.log("winner: ", data);
+      // console.log("winner: ", data);
     });
 
     socket.on("tie", (data) => {
       setTie(data);
-      console.log("tie: ", data);
+      // console.log("tie: ", data);
     });
   }, [socket]);
-  console.log("winner");
-  console.log(winner);
 
   return (
     <div>

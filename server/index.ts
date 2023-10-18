@@ -26,13 +26,13 @@ const rooms: {roomId: string, round: number}[] = [
 
 io.on("connection", (socket) => {
     // Connection -------------------------------------
-    console.log(`Boombayah connected: ${socket.id}`)
+    console.log(`Boombayah welcome: ${socket.id}`)
 
-    socket.on("submit_name", (data) => {
+    socket.on('submit_name', (data) => {
         const user = {sid: socket.id, name: data, roomId: "main", score: 0, ready: false, P1: false};
         users.push(user);
-        console.log("users: ");
-        console.log(users);
+        console.log(`user connected: ${socket.id}`)
+        console.log(`connected users: ${users.length}`);
 
         // Send the list of all connected users to the client
         io.emit('users', users);
@@ -50,17 +50,15 @@ io.on("connection", (socket) => {
 
             const playersInRoom = users.filter((user) => user.roomId === roomId);
 
-            // Broadcasting the list of players in the room to all users in the room
+            // Broadcasting the list of players in the room to all users in the server and the room
             io.to(roomId).emit('players_in_room', playersInRoom);
+            io.emit('users', users);
         }
-
-        // Send the updated list of connected users to all clients
-        io.emit('users', users);
     });
     // -------------------------------------
 
     // Room -------------------------------------
-    socket.on("join_room", (data) => {
+    socket.on('join_room', (data) => {
         socket.join(data);
         console.log(`${socket.id} join_room ${data}`);
 
@@ -90,8 +88,6 @@ io.on("connection", (socket) => {
 
         // Send the list of players in the room to the client who entered the room
         const playersInRoom = users.filter((user) => user.roomId === data);
-        console.log(`players in room ${data} =`)
-        console.log(playersInRoom)
 
         // Broadcasting the list of players in the room to all users in the server and the room
         io.to(data).emit('players_in_room', playersInRoom);
@@ -99,8 +95,8 @@ io.on("connection", (socket) => {
     })
     // -------------------------------------
 
-    // Each game -------------------------------------
-    socket.on("ready", (data) => {
+    // Game -------------------------------------
+    socket.on('ready', (data) => {
         console.log(data, socket.id);
 
         const userIndex = users.findIndex((user) => user.sid === socket.id);
@@ -126,18 +122,52 @@ io.on("connection", (socket) => {
             }
     }})
 
-    socket.on("send_notelist", (data) => {
-        console.log("receive_notelist", data)
+    socket.on('send_notelist', (data) => {
+        console.log("receive_notelist")
         // socket.to sends the event to all sockets in the specified room, but it does not include the current socket.
         // io.to send the event to all sockets in the specified room, regardless of the namespace.
         socket.to(data.roomId).emit("receive_notelist", data);
-    })
+    });
+
+    socket.on('end_turn', (data) => {
+        let addScore = 0;
+        const arrayR = data.arrayReceived
+        const arrayS = data.arraySubmit
+        const minLenght = Math.min(arrayR.length, arrayS.length);
+        for (let i = 0; i < minLenght; i++) {
+            if (arrayR[i].id === arrayS[i].id && arrayR[i].note === arrayS[i].note) {
+                addScore++;
+            }
+        };
+
+        // update score
+        const userIndex = users.findIndex((user) => user.sid === socket.id);
+        if (userIndex !== -1) {
+            users[userIndex].score = users[userIndex].score + addScore;
+        }
+        console.log(`${users[userIndex].name} add ${addScore} = ${users[userIndex].score}`);
+
+        const roomId = users[userIndex].roomId;
+        const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
+        // If is P1
+        if (users[userIndex].P1) {
+            // Round 2 = end game
+            if (rooms[roomIndex].round === 2) {
+                console.log('end_game');
+                // io.to(users[userIndex].roomId).emit('')
+            } else { // Round 1 = continues
+                console.log(`end_round ${rooms[roomIndex].round}`);
+                rooms[roomIndex].round++;
+                io.to(roomId).emit('next_round', {round: rooms[roomIndex].round})
+                io.to(socket.id).emit('start_turn', {round: rooms[roomIndex].round});
+            }
+        } else {
+            io.to(socket.id).emit('start_turn', {round: rooms[roomIndex].round});
+        }       
+    });
 
     socket.on("end_game", (data) => {
         console.log(`end_game: ${data}`)
-        // set score
-
-        // io.to("room").emit(`score: ${data.finalScore}`);
 
         const user = users.find((user) => user.sid === socket.id);
 
