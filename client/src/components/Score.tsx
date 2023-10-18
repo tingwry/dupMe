@@ -58,7 +58,7 @@ function Score() {
           </p>
         </>
       )}
-      {tie && <h1>This match is tied</h1>}
+      {tie && <h1>This match is tied!</h1>}
       {!tie && winner && <h1>The winner is {winner.name}</h1>}
     </div>
   );
