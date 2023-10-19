@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import socket from "../socket";
 import JoinRoom from "./JoinRoom";
+import ReadySetGo from "./ReadySetGo";
 
 function User() {
   const [users, setUsers] = useState<{sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[]>([]);
@@ -31,6 +32,7 @@ function User() {
       setIsConnected(false);
       console.log(`${name} disconnected`);
     });
+
   }, [socket]);
 
   return (

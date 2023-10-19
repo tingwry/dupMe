@@ -16,14 +16,13 @@ const io = new Server(server, {
 })
 
 const users: {sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[] = [];
-const rooms: {roomId: string, round: number}[] = [
-    {roomId: "room 1", round: 1},
-    {roomId: "room 2", round: 1},
-    {roomId: "room 3", round: 1},
-    {roomId: "room 4", round: 1},
-    {roomId: "room 5", round: 1},
+const rooms: {roomId: string, round: number, players: number}[] = [
+    {roomId: "room 1", round: 1, players: 0},
+    {roomId: "room 2", round: 1, players: 0},
+    {roomId: "room 3", round: 1, players: 0},
+    {roomId: "room 4", round: 1, players: 0},
+    {roomId: "room 5", round: 1, players: 0},
 ]
-
 
 io.on('connection', (socket) => {  
     // Connection -------------------------------------
@@ -42,6 +41,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log(`User disconnected: ${socket.id}`);
+        console.log(`connected users: ${users.length}`);
 
         // Remove the user from the connected users array
         const userIndex = users.findIndex((user) => user.sid === socket.id);
@@ -50,10 +50,16 @@ io.on('connection', (socket) => {
             users.splice(userIndex, 1);
 
             const playersInRoom = users.filter((user) => user.roomId === roomId);
+            const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
+
+            // Update the number of players in the room
+            rooms[roomIndex].players = playersInRoom.length
 
             // Broadcasting the list of players in the room to all users in the server and the room
-            io.to(roomId).emit('players_in_room', playersInRoom);
             io.emit('users', users);
+            io.emit('rooms', rooms)
+            io.to(roomId).emit('players_in_room', playersInRoom);
+            
         }
     });
     // -------------------------------------
@@ -69,12 +75,16 @@ io.on('connection', (socket) => {
             users[userIndex].roomId = data;
         }
 
-        // Send the list of players in the room to the client who entered the room
         const playersInRoom = users.filter((user) => user.roomId === data);
+        const roomIndex = rooms.findIndex((room) => room.roomId === data);
+
+        // Update the number of players in the room
+        rooms[roomIndex].players = playersInRoom.length
 
         // Broadcasting the list of players in the room to all users in the server and the room
-        io.to(data).emit('players_in_room', playersInRoom);
         io.emit('users', users);
+        io.emit('rooms', rooms)
+        io.to(data).emit('players_in_room', playersInRoom);
     });
 
     socket.on('leave_room', (data) => {
@@ -85,12 +95,16 @@ io.on('connection', (socket) => {
             socket.leave(previousRoomId);
             users[userIndex].roomId = "main"; // Update the room property for the user in the users array
             
-            // Send the list of players in the room to the client who entered the room
             const playersInRoom = users.filter((user) => user.roomId === previousRoomId);
+            const previousRoomIdIndex = rooms.findIndex((room) => room.roomId === previousRoomId);
+
+            // Update the number of players in the room
+            rooms[previousRoomIdIndex].players = playersInRoom.length;
 
             // Broadcasting the list of players in the room to all users in the server and the room
-            io.to(previousRoomId).emit('players_in_room', playersInRoom);
             io.emit('users', users);
+            io.emit('rooms', rooms);
+            io.to(previousRoomId).emit('players_in_room', playersInRoom);
 
             console.log(`${socket.id} leave_room ${previousRoomId}`);    
         }
@@ -106,21 +120,26 @@ io.on('connection', (socket) => {
         if (userIndex !== -1) {
             // Mark the user as ready
             users[userIndex].ready = true;
+            io.to(socket.id).emit('ready_state', true);
 
             // Check if both players in the room are ready
             const roomId = users[userIndex].roomId;
             const playersInRoom = users.filter((user) => user.roomId === roomId);
-            const bothPlayersReady = playersInRoom.every((player) => player.ready);
+            const bothPlayersReady = playersInRoom.every((player) => player.ready); // what if there's only one player
 
             if (bothPlayersReady) {
-                const firstPlayerSocketId = Math.random() < 0.5 ? playersInRoom[0].sid : playersInRoom[1].sid;
+                let firstPlayerSocketId = playersInRoom.find((player) => player.P1)?.sid
+                if (firstPlayerSocketId === undefined) {
+                    firstPlayerSocketId = Math.random() < 0.5 ? playersInRoom[0].sid : playersInRoom[1].sid;
 
-                // update P1 to true for the person who goes first
-                users.forEach((user) => {
-                    if (user.sid === firstPlayerSocketId) {
-                        user.P1 = true;
-                    }
-                });
+                    // update P1 to true for the person who goes first
+                    users.forEach((user) => {
+                        if (user.sid === firstPlayerSocketId) {
+                            user.P1 = true;
+                        }
+                    });
+                }
+            
                 io.to(firstPlayerSocketId).emit("start_game");
             }
     }})
@@ -132,8 +151,7 @@ io.on('connection', (socket) => {
 
             // socket.to sends the event to all sockets in the specified room, but it does not include the current socket.
             // io.to send the event to all sockets in the specified room, regardless of the namespace.
-            socket.to(roomId).emit("receive_notelist", roomId);
-            console.log("receive_notelist")
+            socket.to(roomId).emit("receive_notelist", data);
         }
     });
 
@@ -175,8 +193,8 @@ io.on('connection', (socket) => {
 
                         // send score + winner to client
 
-                        io.to(roomId).emit('p1', playersInRoom[0]);
-                        io.to(roomId).emit('p2', playersInRoom[1]);
+                        io.to(roomId).emit('playerA', playersInRoom[0]);
+                        io.to(roomId).emit('playerB', playersInRoom[1]);
                         io.to(roomId).emit('tie', tie);
                         io.to(roomId).emit('winner', winner);
                     } else {
@@ -191,13 +209,8 @@ io.on('connection', (socket) => {
                         }
 
                         // send score + winner to client
-
-                        // console.log(playersInRoom[0].roomId);
-                        console.log("playersInRoom")
-                        console.log(playersInRoom)
-                        
-                        io.to(roomId).emit('p1', playersInRoom[0]);
-                        io.to(roomId).emit('p2', playersInRoom[1]);
+                        io.to(roomId).emit('playerA', playersInRoom[0]);
+                        io.to(roomId).emit('playerB', playersInRoom[1]);
                         io.to(roomId).emit('tie', tie);
                         io.to(roomId).emit('winner', winner);
                     }
@@ -214,6 +227,41 @@ io.on('connection', (socket) => {
             io.to(socket.id).emit('start_turn', {round: rooms[roomIndex].round});
         }       
     });
+
+    socket.on('restart', (data) => {
+        const userIndex = users.findIndex((user) => user.sid === socket.id);
+        if (userIndex !== -1) {
+            const roomId = users[userIndex].roomId;
+            const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
+            
+            rooms[roomIndex].round = 1;
+
+            if (data.tie) {
+                users.forEach(user => {
+                    if (user.roomId === roomId) {
+                        user.ready = false;
+                        user.P1 = false;
+                        user.score = 0;
+                    }
+                })
+            } else {
+                users.forEach(user => {
+                    if (user.roomId === roomId) {
+                        user.ready = false;
+                        user.score = 0;
+                        if (user.sid === data.winner) {
+                            user.P1 = true;
+                        } else {
+                            user.P1 = false;
+                        }
+                    }
+                })
+            }  
+            io.to(roomId).emit('ready_state', false) 
+            io.to(roomId).emit('next_round', {round: rooms[roomIndex].round}) 
+            console.log(`restart" ${roomId}`);
+        }
+    })
 
     // socket.on('end_game', (data) => {
     //     console.log(`end_game: ${data}`)
@@ -288,6 +336,11 @@ io.on('connection', (socket) => {
     //     }
     // })
     // -------------------------------------
+
+    // test -------------------------------------
+    socket.on('start_RSG', () => {
+        io.emit('ready_set_go');
+    })
 })
 
 server.listen(3000, () => {

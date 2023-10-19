@@ -1,33 +1,37 @@
 import React, { useEffect, useState } from 'react'
 
 interface Props {
+    running: boolean;
     onTimeout: () => void; 
 }
 
-function ReadySetGo({ onTimeout }: Props) {
+function ReadySetGo({ running, onTimeout }: Props) {
     const [count, setCount] = useState(3);
     const [text, setText] = useState('Ready');
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCount((prevCount) => prevCount - 1);
-        }, 1000);
-    
-        return () => {
-            clearInterval(interval);
-        };
-    }, []);
+        if (running) {
+            const interval = setInterval(() => {
+                setCount((prevCount) => prevCount - 1);
+            }, 1000);
+
+            return () => {
+                clearInterval(interval);
+            };
+        }
+        
+    }, [running]);
 
     useEffect(() => {
         if (count === 0) {
-            setText('Go');
-        } else if (count < 0) {
-            setText('Nothing here');
-        } else {
-            setText(count === 3 ? 'Ready' : 'Set');
+            setText('Your turn');
+            onTimeout();
+        } else if (count === 1) {
+            setText("Go");
+        } else if (count === 2) {
+            setText("Set");
         }
       }, [count]);
-
 
     return (
         <div>{text}</div>

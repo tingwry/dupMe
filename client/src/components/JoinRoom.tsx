@@ -4,7 +4,7 @@ import Piano from "./Piano";
 import "./Component.css";
 
 function JoinRoom() {
-    const [rooms, setRooms] = useState<{ roomId: string, round: number }[]>([]);
+    const [rooms, setRooms] = useState<{ roomId: string, round: number, players: number }[]>([]);
     const [roomId, setRoomId] = useState("");
     const [inRoom, setInRoom] = useState(false);
     const [playersInRoom, setPlayersInRoom] = useState<{sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[]>([]);
@@ -68,7 +68,7 @@ function JoinRoom() {
                                   key={item.roomId}
                                   onClick={() => {handleJoin(item.roomId);}}
                               >
-                                  {item.roomId}
+                                  {item.roomId}, {item.players}
                               </div>
                           ))}
                       </div>

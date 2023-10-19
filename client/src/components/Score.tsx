@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import socket from "../socket";
-import { io } from "socket.io-client";
 
 function Score() {
-  const [p1, setp1] = useState<{
+  const [playerA, setPlayerA] = useState<{
     sid: string;
     name: string;
     roomId: string;
     score: number;
   }>();
-  const [p2, setp2] = useState<{
+  const [playerB, setPlayerB] = useState<{
     sid: string;
     name: string;
     roomId: string;
@@ -23,13 +22,21 @@ function Score() {
   }>();
   const [tie, setTie] = useState(false);
 
+  const handleRestart = () => {
+    if (winner) {
+      socket.emit('restart', {tie: tie, winner: winner.sid})
+    } else {
+      socket.emit('restart', {tie: tie, winner: "none"})
+    }
+  }
+
   useEffect(() => {
-    socket.on("p1", (data) => {
-      setp1(data);
+    socket.on('playerA', (data) => {
+      setPlayerA(data);
     });
 
-    socket.on("p2", (data) => {
-      setp2(data);
+    socket.on('playerB', (data) => {
+      setPlayerB(data);
     });
 
     socket.on("winner", (data) => {
@@ -45,19 +52,20 @@ function Score() {
 
   return (
     <div>
-      {p1 && p2 && (
+      {playerA && playerB && (
         <>
           <h1>Current Scores</h1>
           <p>
-            {p1.name}: {p1.score}
+            {playerA.name}: {playerA.score}
           </p>
           <p>
-            {p2.name}: {p2.score}
+            {playerB.name}: {playerB.score}
           </p>
         </>
       )}
       {tie && <h1>This match is tied!</h1>}
       {!tie && winner && <h1>The winner is {winner.name}</h1>}
+      <button onClick={handleRestart}>Restart</button>
     </div>
   );
 }
