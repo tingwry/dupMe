@@ -10,8 +10,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
-        methods: ["GET", "POST"],
+        origin: "*",
     }
 })
 
@@ -52,7 +51,7 @@ io.on('connection', (socket) => {
             const playersInRoom = users.filter((user) => user.roomId === roomId);
             const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
 
-            // Update the number of players in the room
+            // error // Update the number of players in the room
             rooms[roomIndex].players = playersInRoom.length
 
             // Broadcasting the list of players in the room to all users in the server and the room
@@ -208,11 +207,14 @@ io.on('connection', (socket) => {
                             }
                         }
 
+                        console.log(users);
+
                         // send score + winner to client
                         io.to(roomId).emit('playerA', playersInRoom[0]);
                         io.to(roomId).emit('playerB', playersInRoom[1]);
                         io.to(roomId).emit('tie', tie);
                         io.to(roomId).emit('winner', winner);
+                        io.to(roomId).emit('ready_state', false);
                     }
                 } else {
                     console.log("there's some errorrrrrr");
@@ -257,8 +259,10 @@ io.on('connection', (socket) => {
                     }
                 })
             }  
-            io.to(roomId).emit('ready_state', false) 
-            io.to(roomId).emit('next_round', {round: rooms[roomIndex].round}) 
+
+            console.log(users);
+            io.to(roomId).emit('ready_state', false);
+            io.to(roomId).emit('next_round', {round: rooms[roomIndex].round});
             console.log(`restart" ${roomId}`);
         }
     })

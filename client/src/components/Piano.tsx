@@ -10,11 +10,10 @@ function Piano() {
 
   const [round, setRound] = useState(1);
 
-  const [createDuration, setCreateDuration] = useState(10);
+  const [createDuration, setCreateDuration] = useState(5);
   const [isCreating, setIsCreating] = useState(false);
-  const [followDuration, setFollowDuration] = useState(20);
+  const [followDuration, setFollowDuration] = useState(7);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [isReady, setIsReady] = useState(false); // data from the server
 
   const [notelistReceived, setNotelistReceived] = useState<{ id: number; note: string }[]>([]);
 
@@ -22,12 +21,6 @@ function Piano() {
   const handleClickNote = (item: string) => {
     const newNote = { id: notelist.length, note: item };
     setNotelist([...notelist, newNote]); //Add in array
-  };
-
-  // Ready
-  const handleReady = () => {
-    socket.emit("ready", "this player is ready");
-    // setIsButtonClicked(true);
   };
 
   // Sending notes
@@ -40,10 +33,6 @@ function Piano() {
 
   // Socket event for
   useEffect(() => {
-    socket.on('ready_state', (data) => {
-      setIsReady(data);
-    });
-
     // Starting the game after both are ready
     socket.on("start_game", (data) => {
       setNotelist([]);
@@ -77,16 +66,6 @@ function Piano() {
     return (
         <>
             <Score />
-
-            <button
-                onClick={handleReady}
-                className={isReady ? "button-clicked" : "button-default"}
-            >
-                {isReady
-                  ? "Waiting for the other player to be ready..."
-                  : "Ready"}
-            </button>
-
             <p>Create a pattern:
             <Countdown
                 key={`create_${round}`}

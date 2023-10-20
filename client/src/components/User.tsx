@@ -45,7 +45,7 @@ function User() {
             <h3>Current players: {users.length}</h3>
             {users.map((item) => (
               <div key={item.sid}>
-                {item.sid}, {item.name}, {item.roomId}, {item.score}
+                {item.sid}, {item.name}, {item.roomId}
               </div>
             ))}
             <JoinRoom />

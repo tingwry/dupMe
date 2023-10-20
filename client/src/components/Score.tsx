@@ -50,6 +50,8 @@ function Score() {
     });
   }, [socket]);
 
+  
+
   return (
     <div>
       {playerA && playerB && (
