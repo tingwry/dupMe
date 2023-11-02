@@ -1,0 +1,21 @@
+.rooms-container {
+    display: flex;
+    background-color: darkgrey;
+}
+
+.rooms-container > div {
+    background-color: #f1f1f1;
+    color: black;
+    width: 75px;
+    height: 20px;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+    line-height: 20px;
+}
+
+.rooms-container > div:hover {
+    background-color: DodgerBlue;
+    color: white;
+    cursor: pointer;
+}

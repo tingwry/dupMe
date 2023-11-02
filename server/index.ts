@@ -3,9 +3,15 @@ import http from "http";
 import cors from "cors";
 import { Server } from "socket.io";
 import console from "console";
+import path from "path";
 
 const app = express();
 app.use(cors());
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -17,6 +23,7 @@ const io = new Server(server, {
 import { userHandler } from "./controllers/userHandler";
 import { roomHandler } from "./controllers/roomHandler";
 import { gameHandler } from "./controllers/gameHandler";
+// import { gameHandler2 } from "./controllers/gameV2";
 
 
 io.on('connection', (socket) => {  
@@ -24,6 +31,7 @@ io.on('connection', (socket) => {
     userHandler(io, socket);
     roomHandler(io, socket);
     gameHandler(io, socket);
+    // gameHandler2(io, socket);
 
     // test -------------------------------------
     // socket.on('start_RSG', () => {
@@ -31,6 +39,9 @@ io.on('connection', (socket) => {
     // })
 })
 
-server.listen(3000, () => {
-    console.log("Boombayah is running");
+// Run server
+const PORT = 3000;
+const SERVER_IP = "127.0.0.1"; 
+server.listen(PORT, SERVER_IP, () => {
+    console.log(`Boombayah is running at http://${SERVER_IP}:${PORT}`);
 })

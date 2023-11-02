@@ -33,7 +33,11 @@ export function userHandler(io: Server, socket: Socket): void {
             const playersInRoom = users.filter((user) => user.roomId === roomId);
             const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
 
-            rooms[roomIndex].players = playersInRoom.length;
+            if (rooms && rooms[roomIndex]) {
+                rooms[roomIndex].players = playersInRoom.length;
+            } else {
+                console.error("Room not found or not properly initialized.");
+            }
             
             // Broadcasting the list of players in the room to all users in the server and the room
             io.emit('users', users);

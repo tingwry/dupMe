@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import socket from "../socket";
 import Piano from "./Piano";
 import "./Component.css";
+import Piano2 from "./Piano2";
+import Piano3 from "./Piano3";
 
 function JoinRoom() {
     const [rooms, setRooms] = useState<{ roomId: string, round: number, players: number }[]>([]);
@@ -10,14 +12,6 @@ function JoinRoom() {
     const [playersInRoom, setPlayersInRoom] = useState<{sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[]>([]);
 
     const [isReady, setIsReady] = useState(false); // data from the server
-
-  // const joinRoom = () => {
-  //   if (roomId !== "") {
-  //     socket.emit("join_room", roomId);
-  //     setInRoom(true);
-  //     console.log("join_room", roomId);
-  //   }
-  // };
 
     const handleJoin = (item: string) => {
         socket.emit('join_room', item);
@@ -74,7 +68,9 @@ function JoinRoom() {
                             ? "Waiting for the other player to be ready..."
                             : "Ready"}
                         </button>
-                        <Piano />
+                        {/* <Piano /> */}
+                        {/* <Piano2 /> */}
+                        <Piano3 />
                     </> ) : ( <>
                         {/* <input
                             placeholder="Room Number..."

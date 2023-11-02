@@ -20,7 +20,8 @@ function Piano() {
   // Click note
   const handleClickNote = (item: string) => {
     const newNote = { id: notelist.length, note: item };
-    setNotelist([...notelist, newNote]); //Add in array
+    const updatedNotelist = [...notelist, newNote]
+    setNotelist(updatedNotelist); //Add in array
   };
 
   // Sending notes
@@ -48,7 +49,6 @@ function Piano() {
       setRound(data.round);
     })
 
-    // Receiving notes
     socket.on("receive_notelist", (data) => {
       setNotelist([]);
       setNotelistReceived(data.notelist);
@@ -83,7 +83,6 @@ function Piano() {
                 onTimeout={() => endTurn(notelistReceived, notelist)}
             />
             </p>
-            
 
             <div className="piano-container">
                 {allnotes.map((item) => (

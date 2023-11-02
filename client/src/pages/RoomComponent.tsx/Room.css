@@ -1,0 +1,50 @@
+.players-container {
+    display: grid;
+    background-color: aqua;
+    grid-template-columns: auto auto auto auto;
+}
+
+.player {
+    background-color: bisque;
+    /* padding: 20px;
+    margin: 5px; */
+}
+
+.add-score {
+    grid-column: 2 / span 2;
+    background-color: blue;
+}
+
+.piano-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.piano-container > div {
+    background-color: white;
+    height: 150px;
+    width: 60px;
+    border: 2px solid black;
+
+    position: relative;
+    color: black;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.piano-container > div:hover {
+    cursor: pointer;
+}
+
+.piano-container > div:active {
+    background-color: DodgerBlue;
+    color: white;
+}
+
+.piano-container > div > div {
+    position: relative;
+    color: black;
+    font-weight: 400;
+    font-size: 20px;
+    margin-top: 110px;
+}

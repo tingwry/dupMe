@@ -24,7 +24,6 @@ export function roomHandler(io: Server, socket: Socket): void {
     }
 
     const leaveRoom = () => {
-        // array
         const userIndex = users.findIndex((user) => user.sid === socket.id);   
         if (userIndex !== -1) {
             const previousRoomId = users[userIndex].roomId;
@@ -36,7 +35,8 @@ export function roomHandler(io: Server, socket: Socket): void {
             const previousRoomIdIndex = rooms.findIndex((room) => room.roomId === previousRoomId);
 
             // Update the number of players in the room
-            rooms[previousRoomIdIndex].players = playersInRoom.length;
+            const playerCount = playersInRoom.length;
+            rooms[previousRoomIdIndex].players = playerCount
 
             // Broadcasting the list of players in the room to all users in the server and the room
             io.emit('users', users);
