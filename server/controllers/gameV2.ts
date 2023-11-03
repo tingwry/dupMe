@@ -76,10 +76,6 @@ export function gameHandler2(io: Server, socket: Socket): void {
         console.log(`${users[userIndex].name} add ${addScore} = ${users[userIndex].score}`);
     }
 
-    // const endTurn = () => {
-
-    // }
-
     const endTurn = (data: any) => {
         console.log('checkEnd')
         const userIndex = users.findIndex((user) => user.sid === socket.id);

@@ -104,9 +104,7 @@ export function gameHandler(io: Server, socket: Socket): void {
     }
 
     const endTurn = (data: any) => {
-
         let addScore = scoring(data);
-        
         
         const userIndex = users.findIndex((user) => user.sid === socket.id);
         if (userIndex !== -1) {
@@ -116,14 +114,15 @@ export function gameHandler(io: Server, socket: Socket): void {
 
             const roomId = users[userIndex].roomId;
             const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
+            const playersInRoom = users.filter((user) => user.roomId === roomId);
 
             io.to(roomId).emit('score', addScore);
+            io.to(roomId).emit('players_in_room', playersInRoom);
 
             if (users[userIndex].P1) { // If is P1
                 if (rooms[roomIndex].round === 2) { // Round 2 = end game
                     console.log(`end_game ${roomId}`);
-                    const playersInRoom = users.filter((user) => user.roomId === roomId);
-    
+                    
                     // find winner
                     let winner = playersInRoom[0];
                     let tie = false;

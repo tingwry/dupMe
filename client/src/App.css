@@ -40,3 +40,12 @@
 .read-the-docs {
   color: #888;
 }
+
+.tab {
+  background-color: #D16532;
+  display: block;
+}
+
+.content {
+  background-color: #F4EFE5;
+}

@@ -1,8 +1,4 @@
-.players-container {
-    display: grid;
-    background-color: aqua;
-    grid-template-columns: auto auto auto auto;
-}
+
 
 .player {
     background-color: bisque;
@@ -13,6 +9,15 @@
 .add-score {
     grid-column: 2 / span 2;
     background-color: blue;
+}
+
+.players-container {
+    display: grid;
+    background-color: aqua;
+    grid-template-columns: auto auto auto auto;
+    gap: 10px;
+    padding: 5px;
+    /* width: 800px; */
 }
 
 .piano-container {

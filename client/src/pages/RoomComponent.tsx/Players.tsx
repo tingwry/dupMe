@@ -6,9 +6,13 @@ function Players() {
     const [playersInRoom, setPlayersInRoom] = useState<{sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[]>([]);
 
     useEffect(() => {
-        socket.on("players_in_room", (data) => {
+        socket.on('players_in_room', (data) => {
             setPlayersInRoom(data);
         });
+
+        socket.on('score', (data) => {
+
+        }) 
     }, [socket]);
 
     return (
@@ -27,9 +31,9 @@ function Players() {
             </div>
             {playersInRoom.map((item) => (
                     <div key={item.sid}>
-                        {item.name}, {item.roomId}
+                        {item.name}, {item.score}
                     </div>
-                ))}
+            ))}
         </>
     )
 }

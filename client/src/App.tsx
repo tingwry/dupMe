@@ -12,10 +12,16 @@ import Room from "./pages/Room";
 function App() {
   return (
     <div className="App">
-      <Routes>
-        <Route path='/' element={ <Welcome /> } />
-        <Route path='/room' element={ <Room /> } />
-      </Routes>
+      <div className="tab">
+        DupMe
+      </div>
+      <div className="content">
+        <Routes>
+          <Route path='/' element={ <Welcome /> } />
+          <Route path='/room' element={ <Room /> } />
+        </Routes>
+      </div>
+      
       {/* <User /> */}
       {/* <Welcome/> */}
       {/* <Room /> */}
