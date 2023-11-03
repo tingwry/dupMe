@@ -4,7 +4,8 @@ import socket from '../../socket';
 function Ready() {
     const [isReady, setIsReady] = useState(false); // data from the server
     const handleReady = () => {
-        socket.emit("ready", "this player is ready");
+        socket.emit('ready');
+        console.log('ready')
     };
 
     useEffect(() => {

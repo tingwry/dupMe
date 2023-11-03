@@ -36,6 +36,7 @@ export function roomHandler(io: Server, socket: Socket): void {
 
             if (previousRoomIdIndex !== -1) {
                 // Update the number of players in the room
+                rooms[previousRoomIdIndex].round = 1;
                 rooms[previousRoomIdIndex].players = playersInRoom.length;
                 
                 // Broadcasting the list of players in the room to all users in the server and the room

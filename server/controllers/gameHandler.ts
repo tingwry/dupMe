@@ -68,6 +68,14 @@ export function gameHandler(io: Server, socket: Socket): void {
     //     }
     // }
 
+    const startCreate = (sid: string) => {
+        io.to(sid).emit('start_create');
+    }
+
+    const startFollow = (sid: string) => {
+        io.to(sid).emit('start_follow');
+    }
+
     const sendNoteList = (data: any) => {
         const userIndex = users.findIndex((user) => user.sid === socket.id);
         if (userIndex !== -1) {
@@ -88,6 +96,10 @@ export function gameHandler(io: Server, socket: Socket): void {
         } else {
             console.log("User not found")
         }
+    }
+
+    const endFollow = () => {
+        
     }
 
     const scoring = (data: any) => {

@@ -15,5 +15,4 @@ export let rooms: {
     {roomId: "room 1", round: 1, players: 0},
     {roomId: "room 2", round: 1, players: 0},
     {roomId: "room 3", round: 1, players: 0},
-
 ];

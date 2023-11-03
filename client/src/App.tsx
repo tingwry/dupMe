@@ -10,24 +10,22 @@ import Room from "./pages/Room";
 
 
 function App() {
-  return (
-    <div className="App">
-      <div className="tab">
-        DupMe
-      </div>
-      <div className="content">
-        <Routes>
-          <Route path='/' element={ <Welcome /> } />
-          <Route path='/room' element={ <Room /> } />
-        </Routes>
-      </div>
-      
-      {/* <User /> */}
-      {/* <Welcome/> */}
-      {/* <Room /> */}
-      {/* <Score /> */}
-    </div>
-  );
+    return (
+        <div className="App">
+            <div className="tab">
+                DupMe
+            </div>
+            <Routes>
+                <Route path='/' element={ <Welcome /> } />
+                <Route path='/room' element={ <Room /> } />
+            </Routes>
+            
+            {/* <User /> */}
+            {/* <Welcome/> */}
+            {/* <Room /> */}
+            {/* <Score /> */}
+        </div>
+    );
 }
 
 export default App;
