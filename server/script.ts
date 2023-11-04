@@ -1,6 +1,7 @@
 import { users, rooms } from "./dataStorage";
+import { Socket } from "socket.io";
 
-const updatePlayerCount = (): void => {
+export function updatePlayerCount(): void  {
     console.log(users)
     const count: number = users.length;
     const playerCountElement: HTMLElement | null = document.getElementById('player-count');
@@ -9,13 +10,12 @@ const updatePlayerCount = (): void => {
     }
 };
 
-const restartFunction = (): void => {
+export function restart(): void {
     // Add your restart logic here
+    console.log('restart')
 };
-
-updatePlayerCount();
 
 const restartButton: HTMLButtonElement | null = document.getElementById('restart-button') as HTMLButtonElement;
 if (restartButton) {
-    restartButton.addEventListener('click', restartFunction);
+    restartButton.addEventListener('click', restart);
 }

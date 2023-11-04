@@ -22,21 +22,16 @@ const io = new Server(server, {
 
 import { userHandler } from "./controllers/userHandler";
 import { roomHandler } from "./controllers/roomHandler";
-// import { gameHandler } from "./controllers/gameHandler";
-import { gameHandler3 } from "./controllers/gamev3";
+import { gameHandler } from "./controllers/gameHandler";
+// import { gameHandler3 } from "./controllers/gamev3";
 
 
 io.on('connection', (socket) => {  
     console.log(`Boombayah welcome: ${socket.id}`)
     userHandler(io, socket);
     roomHandler(io, socket);
-    // gameHandler(io, socket);
-    gameHandler3(io, socket);
-
-    // test -------------------------------------
-    // socket.on('start_RSG', () => {
-    //     io.emit('ready_set_go');
-    // })
+    gameHandler(io, socket);
+    // gameHandler3(io, socket);
 })
 
 // Run server
