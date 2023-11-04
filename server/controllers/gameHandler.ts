@@ -185,7 +185,7 @@ export function gameHandler(io: Server, socket: Socket): void {
         }
     }
 
-    const restart = () => {
+    const clientRestart = () => {
         // Info
         const userInfo = info();
         const sid = socket.id
@@ -213,5 +213,5 @@ export function gameHandler(io: Server, socket: Socket): void {
     socket.on('send_notelist', sendNoteList);
     socket.on('end_create', endCreate);
     socket.on('end_follow', endFollow);
-    socket.on('restart', restart);
+    socket.on('client-restart', clientRestart);
 }

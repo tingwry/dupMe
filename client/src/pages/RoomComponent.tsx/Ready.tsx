@@ -8,6 +8,10 @@ function Ready() {
         console.log('ready')
     };
 
+    const handleRestart = () => {
+        socket.emit('client-restart')
+    }
+
     useEffect(() => {
         socket.on('ready_state', (data) => {
             setIsReady(data);
@@ -27,6 +31,8 @@ function Ready() {
                 Ready
             </button> 
         )}
+        <p></p>
+        <button onClick={handleRestart}>Restart</button>
 
         </>
     )
