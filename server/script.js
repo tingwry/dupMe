@@ -13,6 +13,10 @@ function user()  {
     }
 };
 
+function refreshUsers() {
+    socket.emit('server_users');
+}
+
 function serverRestart(roomId) {
     console.log(`${roomId} restart`);
     socket.emit('server_restart', {roomId: roomId});

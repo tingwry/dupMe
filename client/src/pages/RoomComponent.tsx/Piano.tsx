@@ -58,7 +58,12 @@ function Piano() {
             setRound(data.round);
         })
 
-        socket.on('restart', () => {
+        socket.on('restart', (data) => {
+            setNotelist([]);
+            setNotelistReceived([]);
+            setRound(data.round);
+            setIsCreating(false);
+            setIsFollowing(false);
             console.log('restart')
         })
     }, [socket]);

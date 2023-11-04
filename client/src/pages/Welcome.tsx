@@ -50,7 +50,7 @@ function Welcome() {
     return (
         <>
             {/* {!inRoom && <> */}
-                <h1>Welcome !</h1>
+                <h1>WELCOME!</h1>
                 {isConnected ? (
                     <>
                         <p>static pic</p>

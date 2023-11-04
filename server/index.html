@@ -10,7 +10,11 @@
     <script src="script.js"></script>
 
     <h1>Hello</h1>
-    <h2 id="user-count">0 users online</h2>
+    <div>
+        <h2 id="user-count">0 users online</h2>
+        <button onclick="refreshUsers()">Refresh User</button>
+    </div>
+    
     <div>
         <h3>Room 1</h3>
         <button onclick="serverRestart('room 1')">room 1 Restart</button>

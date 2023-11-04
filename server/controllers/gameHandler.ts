@@ -23,7 +23,8 @@ export function gameHandler(io: Server, socket: Socket): void {
 
     const startCreate = (sid: string, roomId: string, round: number) => {
         io.to(sid).emit('start_create');
-        io.to(roomId).emit('start_turn', {round: round});
+        io.to(roomId).emit('start_turn', { round: round }); // to reset timer
+        console.log(`round ${round}`)
     }
 
     const scoring = (arrayR: { id: number; note: string }[], arrayS: { id: number; note: string }[]) => {
@@ -56,6 +57,8 @@ export function gameHandler(io: Server, socket: Socket): void {
                     playerInRoom.ready = false;
                     playerInRoom.P1 = false;
                 });
+
+                io.to(roomId).emit('tie', tie);
             } else {
                 const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
                 console.log("max score:", maxScore);
@@ -74,12 +77,11 @@ export function gameHandler(io: Server, socket: Socket): void {
                         playerInRoom.P1 = false;
                     }
                 }
+
+                io.to(roomId).emit('winner', winner.name);
             }
 
-            // send winner to client
-            io.to(roomId).emit('tie', tie);
-            io.to(roomId).emit('winner', winner);
-            io.to(roomId).emit('ready_state', false);
+            // io.to(roomId).emit('ready_state', false);
         } else {
             console.log("there's some errorrrrrr");
         }
@@ -115,6 +117,8 @@ export function gameHandler(io: Server, socket: Socket): void {
                         }
                     });
                 }
+
+                rooms[roomIndex].round = 1;
                 const round = rooms[roomIndex].round;
                 startCreate(firstPlayerSocketId, roomId, round);
             }
@@ -170,7 +174,7 @@ export function gameHandler(io: Server, socket: Socket): void {
         if (users[userIndex].P1) { // If is P1
             if (rooms[roomIndex].round === 2) { // Round 2 = end game
                 // console.log(`end_game ${roomId} ${rooms[roomIndex].round}`);
-                rooms[roomIndex].round = 1;
+                rooms[roomIndex].round = 0;
                 winner(roomId);
             } else { // Round 1 = continues
                 // console.log(`end_round ${roomId} ${rooms[roomIndex].round}`);
@@ -201,12 +205,11 @@ export function gameHandler(io: Server, socket: Socket): void {
             playerInRoom.P1 = false;
         });
 
-        rooms[roomIndex].round = 1;
+        rooms[roomIndex].round = 0;
 
-        io.to(roomId).emit('restart');
-        
-        // dont forget to reset round in front
-
+        io.to(roomId).emit('restart', { round: 0 });
+        io.to(roomId).emit('players_in_room', playersInRoom);
+        io.to(roomId).emit('ready_state', false);
     }
 
     socket.on('ready', ready);
