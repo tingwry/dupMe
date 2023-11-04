@@ -14,8 +14,8 @@ const io = new Server(server, {
     }
 })
 
-const users: {sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[] = [];
-const rooms: {roomId: string, round: number, players: number}[] = [
+let users: {sid: string, name: string, roomId: string, score: number, ready: boolean, P1: boolean}[] = [];
+let rooms: {roomId: string, round: number, players: number}[] = [
     {roomId: "room 1", round: 1, players: 0},
     {roomId: "room 2", round: 1, players: 0},
     {roomId: "room 3", round: 1, players: 0},
@@ -51,8 +51,7 @@ io.on('connection', (socket) => {
             const playersInRoom = users.filter((user) => user.roomId === roomId);
             const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
 
-            // error // Update the number of players in the room
-            rooms[roomIndex].players = playersInRoom.length
+            rooms[roomIndex].players = playersInRoom.length;
 
             // Broadcasting the list of players in the room to all users in the server and the room
             io.emit('users', users);
@@ -65,26 +64,36 @@ io.on('connection', (socket) => {
 
     // Room -------------------------------------
     socket.on('join_room', (data) => {
-        socket.join(data);
-        console.log(`${socket.id} join_room ${data}`);
+        const roomId = data;
+        const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
 
-        // Update the room property for the user in the users array
-        const userIndex = users.findIndex((user) => user.sid === socket.id);
-        if (userIndex !== -1) {
-            users[userIndex].roomId = data;
+        // Check if there are less than 2 players in the room
+        if (rooms[roomIndex].players < 2) {
+            socket.join(roomId);
+            console.log(`${socket.id} join_room ${roomId}`);
+
+            // Update the room property for the user in the users array
+            const userIndex = users.findIndex((user) => user.sid === socket.id);
+            if (userIndex !== -1) {
+                users[userIndex].roomId = roomId;
+            }
+
+            const playersInRoom = users.filter((user) => user.roomId === roomId);
+
+            // Update the number of players in the room
+            rooms[roomIndex].players = playersInRoom.length
+
+            // Broadcasting the list of players in the room to all users in the server and the room
+            io.emit('users', users);
+            io.emit('rooms', rooms)
+            io.to(roomId).emit('players_in_room', playersInRoom);
+        } else {
+            // Notify the client that the room is full
+            io.to(socket.id).emit('room_full');
         }
-
-        const playersInRoom = users.filter((user) => user.roomId === data);
-        const roomIndex = rooms.findIndex((room) => room.roomId === data);
-
-        // Update the number of players in the room
-        rooms[roomIndex].players = playersInRoom.length
-
-        // Broadcasting the list of players in the room to all users in the server and the room
-        io.emit('users', users);
-        io.emit('rooms', rooms)
-        io.to(data).emit('players_in_room', playersInRoom);
     });
+
+
 
     socket.on('leave_room', (data) => {
         const userIndex = users.findIndex((user) => user.sid === socket.id);       
