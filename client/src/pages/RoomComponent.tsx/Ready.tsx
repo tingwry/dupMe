@@ -3,6 +3,7 @@ import socket from '../../socket';
 
 function Ready() {
     const [isReady, setIsReady] = useState(false); // data from the server
+    const [gameStatus, setGameStatus] = useState(false);
     const handleReady = () => {
         socket.emit('ready');
         console.log('ready')
@@ -18,6 +19,7 @@ function Ready() {
         });
     }, [socket]);
 
+
     return (
         <>
         <p></p>
@@ -31,8 +33,8 @@ function Ready() {
                 Ready
             </button> 
         )}
-        <p></p>
         <button onClick={handleRestart}>Restart</button>
+        
 
         </>
     )

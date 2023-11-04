@@ -70,7 +70,7 @@ function Piano() {
 
     return (
         <>
-            <p>Create a pattern:
+            <p>Create a pattern: 
             <Countdown
                 key={`create_${round}`}
                 duration={createDuration}
@@ -79,7 +79,7 @@ function Piano() {
             />
             </p>
 
-            <p>Follow the pattern: 
+            <p>Follow the pattern:  
             <Countdown
                 key={`follow_${round}`}
                 duration={followDuration}
@@ -87,17 +87,6 @@ function Piano() {
                 onTimeout={endFollow}
             />
             </p>
-
-            <div className="piano-container">
-                {allnotes.map((item) => (
-                    <div
-                        key={item}
-                        onClick={() => {handleClickNote(item);}}
-                    >
-                        <div>{item}</div>
-                    </div>
-                ))}
-            </div>
 
             <h3>Display</h3>
             <div>
@@ -120,6 +109,19 @@ function Piano() {
                 }
                 
             </div>
+
+            <div className="piano-container">
+                {allnotes.map((item) => (
+                    <div
+                        key={item}
+                        onClick={() => {handleClickNote(item);}}
+                    >
+                        <div>{item}</div>
+                    </div>
+                ))}
+            </div>
+
+            
         </>
     )
 }

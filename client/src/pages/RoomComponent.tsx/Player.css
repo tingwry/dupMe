@@ -1,0 +1,42 @@
+.playerA {
+    grid-area: playerA;
+    width: 200px;
+}
+
+.playerB {
+    grid-area: playerB;
+    width: 200px;
+}
+
+.status {
+    grid-area: status;
+    width: 300px;
+    overflow-wrap: break-word;
+    padding: 20px;
+}
+
+.piano {
+    grid-area: piano;
+    align-content: center;
+    justify-content: center;
+    background-color: var(--beige);
+}
+
+.player-container {
+    display: grid;
+    background-color: aqua;
+    grid-template-areas: 
+        'playerA status status playerB'
+        'piano piano piano piano';
+    gap: 10px;
+    padding: 10px;
+    /* width: 600px; */
+    align-content: center;
+    justify-content: center;
+}
+
+.player-container > div {
+    background-color: var(--beige);
+    text-align: center;
+    padding: 20px 0;
+}

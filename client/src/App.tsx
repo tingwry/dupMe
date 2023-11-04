@@ -7,6 +7,7 @@ import Score from "./components/Score";
 import Welcome from "./pages/Welcome";
 import { Route, Routes } from "react-router-dom";
 import Room from "./pages/Room";
+import Player from "./pages/RoomComponent.tsx/Player";
 
 
 function App() {
@@ -15,10 +16,11 @@ function App() {
             <div className="tab">
                 DupMe
             </div>
-            <Routes>
+            <Player />
+            {/* <Routes>
                 <Route path='/' element={ <Welcome /> } />
                 <Route path='/room' element={ <Room /> } />
-            </Routes>
+            </Routes> */}
             
             {/* <User /> */}
             {/* <Welcome/> */}

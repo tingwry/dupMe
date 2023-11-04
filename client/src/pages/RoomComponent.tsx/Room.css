@@ -23,27 +23,26 @@
 .piano-container {
     display: flex;
     flex-direction: row;
+    /* background-color: blue; */
+    align-content: center;
+    justify-content: center;
 }
 
 .piano-container > div {
     background-color: white;
     height: 150px;
     width: 60px;
-    border: 2px solid black;
+    border: 2px solid var(--beige);
 
     position: relative;
     color: black;
     font-weight: 600;
     font-size: 20px;
-}
-
-.piano-container > div:hover {
     cursor: pointer;
 }
 
 .piano-container > div:active {
-    background-color: DodgerBlue;
-    color: white;
+    background-color: var(--brick);
 }
 
 .piano-container > div > div {
