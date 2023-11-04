@@ -3,11 +3,11 @@ import socket from '../../socket';
 import Countdown from './Countdown';
 import './Room.css'
 
-function Piano() {
+function Pianov2() {
     const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
     const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
     const [notelistReceived, setNotelistReceived] = useState<{ id: number; note: string }[]>([]);
-    const [round, setRound] = useState(0);
+    const [round, setRound] = useState(1);
 
     const [createDuration, setCreateDuration] = useState(5);
     const [isCreating, setIsCreating] = useState(false);
@@ -24,43 +24,66 @@ function Piano() {
         }
     };
 
+    const startCreate = () => {
+        setNotelist([]);
+        setNotelistReceived([]);
+        setIsCreating(true);
+    }
+
+    const startFollow = () => {
+        setNotelist([]);
+        setIsFollowing(true);
+    }
+
     const endCreate = () => {
         socket.emit('end_create');
         setIsCreating(false);
     }
 
     const endFollow = () => {
-        socket.emit('end_follow', { arrayR: notelistReceived, arrayS: notelist });
+        socket.emit('end_follow', { arrayReceived: notelistReceived, arraySubmit: notelist });
+        setIsFollowing(false);
         setNotelist([]);
         setNotelistReceived([]);
-        setIsFollowing(false);  
     }
+    
+    const endTurn = () => {
+        socket.emit('end_turn', { arrayReceived: notelistReceived, arraySubmit: notelist });
+        setIsFollowing(false);
+        setNotelist([]);
+        setNotelistReceived([]);
+    };
 
     useEffect(() => {
-        socket.on('start_create', (data) => {
-            setNotelist([]);
-            setNotelistReceived([]);
-            setIsCreating(true);
-        })
+        // Starting the game after both are ready
+        socket.on('start_game', (data) => {
+        setNotelist([]);
+        setNotelistReceived([]);
+        setIsCreating(true);
+        });
 
+        socket.on('start_turn', (data) => {
+        setNotelist([]);
+        setNotelistReceived([]);
+        setIsCreating(true);
+        });
+
+        socket.on('next_round', (data) =>{
+        setRound(data.round);
+        setNotelist([]);
+        setNotelistReceived([]);
+        });
+
+        socket.on('start_follow', () => {
+        setNotelist([]);
+        console.log('start_follow');
+        setIsFollowing(true);
+        });
+        
         socket.on('receive_notelist', (data) => {
             setNotelistReceived(data.notelist);
         });
 
-        socket.on('start_follow', () => {
-            setNotelist([]);
-            setIsFollowing(true); // also hide the received note
-        })
-
-        socket.on('start_turn', (data) => {
-            setNotelist([]);
-            setNotelistReceived([]);
-            setRound(data.round);
-        })
-
-        socket.on('restart', () => {
-            console.log('restart')
-        })
     }, [socket]);
 
     return (
@@ -79,7 +102,7 @@ function Piano() {
                 key={`follow_${round}`}
                 duration={followDuration}
                 running={isFollowing}
-                onTimeout={endFollow}
+                onTimeout={endTurn}
             />
             </p>
 
@@ -119,4 +142,4 @@ function Piano() {
     )
 }
 
-export default Piano
+export default Pianov2

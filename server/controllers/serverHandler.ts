@@ -2,10 +2,6 @@ import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 
 export function serverHandler(io: Server, socket: Socket): void {
-    const clientEvent = () => {
-        console.log('clientEvent')
-    }
-
     const serverRestart = (data: any) => {
         console.log(`serverRestart ${data.roomId}`)
         const roomId = data.roomId;
@@ -23,6 +19,5 @@ export function serverHandler(io: Server, socket: Socket): void {
         io.to(roomId).emit('restart');
     }
 
-    socket.on('clientEvent', clientEvent);
     socket.on('server_restart', serverRestart);
 }

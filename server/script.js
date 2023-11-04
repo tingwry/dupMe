@@ -4,7 +4,7 @@
 
 const socket = io(':3000');
 
-function updatePlayerCount()  {
+function user()  {
     console.log(users)
     const count = users.length;
     const playerCountElement = document.getElementById('player-count');
@@ -16,5 +16,13 @@ function updatePlayerCount()  {
 function serverRestart(roomId) {
     console.log(`${roomId} restart`);
     socket.emit('server_restart', {roomId: roomId});
-
 }
+
+socket.on('users', (data) => {
+    console.log(data);
+    const userCountServer = data.length;
+    const userCountElement = document.getElementById('user-count');
+    if (userCountElement) {
+        userCountElement.innerHTML = `${userCountServer} users online`
+    }
+})
