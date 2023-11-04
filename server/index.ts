@@ -9,8 +9,18 @@ const app = express();
 app.use(cors());
 
 app.get('/', (req, res) => {
+    
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+app.get('/script.js', (req, res) => {
+    res.setHeader('Content-Type', 'text/javascript');
+    res.sendFile(path.join(__dirname, 'script.js'));
+});
+
+app.get('/dataStorage', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dataStorage.ts'));
+})
 
 const server = http.createServer(app);
 
@@ -23,6 +33,7 @@ const io = new Server(server, {
 import { userHandler } from "./controllers/userHandler";
 import { roomHandler } from "./controllers/roomHandler";
 import { gameHandler } from "./controllers/gameHandler";
+import { serverHandler } from "./controllers/serverHandler";
 // import { gameHandler3 } from "./controllers/gamev3";
 
 
@@ -32,6 +43,7 @@ io.on('connection', (socket) => {
     roomHandler(io, socket);
     gameHandler(io, socket);
     // gameHandler3(io, socket);
+    serverHandler(io, socket);
 })
 
 // Run server

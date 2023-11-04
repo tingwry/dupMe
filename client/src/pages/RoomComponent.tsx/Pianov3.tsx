@@ -57,14 +57,6 @@ function Pianov3() {
             setNotelistReceived([]);
             setRound(data.round);
         })
-
-        // Starting the game after both are ready
-        // socket.on('start_game', (data) => {
-        // setNotelist([]);
-        // setNotelistReceived([]);
-        // setIsCreating(true);
-        // });
-
     }, [socket]);
 
     return (

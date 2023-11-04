@@ -202,6 +202,8 @@ export function gameHandler(io: Server, socket: Socket): void {
         });
 
         rooms[roomIndex].round = 1;
+
+        io.to(roomId).emit('restart');
         
         // dont forget to reset round in front
 

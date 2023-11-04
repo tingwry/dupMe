@@ -1,5 +1,6 @@
-import { users, rooms } from "./dataStorage";
-import { io } from "socket.io"
+// import { users, rooms } from "./dataStorage";
+// import { io } from "socket.io"
+// const { io } = require("socket.io");
 
 const socket = io(':3000');
 
@@ -12,27 +13,8 @@ function updatePlayerCount()  {
     }
 };
 
-function restart() {
-    // Add your restart logic here
-    console.log('restart')
-    return;
-};
+function serverRestart(roomId) {
+    console.log(`${roomId} restart`);
+    socket.emit('server_restart', {roomId: roomId});
 
-// const restartButton = document.getElementById('restart-button');
-// if (restartButton) {
-//     restartButton.addEventListener('click', restart);
-// }
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const restartButton = document.getElementById('restart-button');
-//     if (restartButton) {
-//         restartButton.addEventListener('click', restart);
-//     }
-// });
-
-document.addEventListener('DOMContentLoaded', function () {
-    const restartButton = document.getElementById('restart-button');
-    if (restartButton) {
-        restartButton.addEventListener('click', restart);
-    }
-});
+}
