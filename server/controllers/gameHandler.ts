@@ -210,6 +210,8 @@ export function gameHandler(io: Server, socket: Socket): void {
         io.to(roomId).emit('restart', { round: 0 });
         io.to(roomId).emit('players_in_room', playersInRoom);
         io.to(roomId).emit('ready_state', false);
+
+        console.log(`client restart ${roomId}`)
     }
 
     socket.on('ready', ready);

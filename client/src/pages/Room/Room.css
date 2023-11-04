@@ -38,5 +38,6 @@
 .player-container > div {
     background-color: var(--beige);
     text-align: center;
-    padding: 20px 0;
+    margin: 0;
+    padding: 10px 0;
 }

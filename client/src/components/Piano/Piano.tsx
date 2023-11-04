@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import socket from '../../socket';
-import Countdown from './Countdown';
-import './Room.css'
+import Countdown from '../Countdown';
+import './Piano.css'
 
 function Piano() {
     const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
@@ -70,53 +70,49 @@ function Piano() {
 
     return (
         <>
-            <p>Create a pattern: 
-            <Countdown
-                key={`create_${round}`}
-                duration={createDuration}
-                running={isCreating}
-                onTimeout={endCreate}
-            />
-            </p>
+            <div className='countdown'>Create a pattern: 
+                <Countdown
+                    key={`create_${round}`}
+                    duration={createDuration}
+                    running={isCreating}
+                    onTimeout={endCreate}
+                />
+            </div>
 
-            <p>Follow the pattern:  
+            <div className='countdown'>Follow the pattern:  
             <Countdown
                 key={`follow_${round}`}
                 duration={followDuration}
                 running={isFollowing}
                 onTimeout={endFollow}
             />
-            </p>
-
-            <h3>Display</h3>
-            <div>
+            </div>
+            <div className='display'>
+                <h3>Display</h3>
                 {notelist.map((item) => (
                     <div className="display-note" key={item.id}>
                         {item.note}
                     </div>
                 ))}
-            </div>            
-
-            <h3>Received</h3>
-            <div>
+            </div>
+                        
+            <div className='display'>
+                <h3>Received</h3>
                 {!isFollowing && (<>
                     {notelistReceived.map((item) => (
                     <div className="display-note" key={item.id}>
                         {item.note}
                     </div>
-                ))}</>)
-                
-                }
-                
+                ))}</>)}
             </div>
-
+            
             <div className="piano-container">
                 {allnotes.map((item) => (
                     <div
                         key={item}
                         onClick={() => {handleClickNote(item);}}
                     >
-                        <div>{item}</div>
+                        {item}
                     </div>
                 ))}
             </div>

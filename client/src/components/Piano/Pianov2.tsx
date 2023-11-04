@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import "./Component.css";
-import Countdown from "./Countdown";
-import socket from "../socket";
-import Score from "./Score";
+import React, { useEffect, useState } from 'react'
+import socket from '../../socket';
+import Countdown from '../Countdown';
+import './Piano.css'
 
-function Piano3() {
+function Pianov2() {
     const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
     const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
-
+    const [notelistReceived, setNotelistReceived] = useState<{ id: number; note: string }[]>([]);
     const [round, setRound] = useState(1);
 
     const [createDuration, setCreateDuration] = useState(5);
@@ -15,47 +14,68 @@ function Piano3() {
     const [followDuration, setFollowDuration] = useState(7);
     const [isFollowing, setIsFollowing] = useState(false);
 
-    const [notelistReceived, setNotelistReceived] = useState<{ id: number; note: string }[]>([]);
-
     // Click note
     const handleClickNote = (item: string) => {
-        const newNote = { id: notelist.length, note: item };
-        const updatedNotelist = [...notelist, newNote]; //Add in array
-        setNotelist(updatedNotelist);
-        socket.emit('send_notelist', { notelist: updatedNotelist });
+        if (isCreating || isFollowing) {
+            const newNote = { id: notelist.length, note: item };
+            const updatedNotelist = [...notelist, newNote]; //Add in array
+            setNotelist(updatedNotelist);
+            socket.emit('send_notelist', { notelist: updatedNotelist });
+        }
     };
+
+    const startCreate = () => {
+        setNotelist([]);
+        setNotelistReceived([]);
+        setIsCreating(true);
+    }
+
+    const startFollow = () => {
+        setNotelist([]);
+        setIsFollowing(true);
+    }
 
     const endCreate = () => {
         socket.emit('end_create');
         setIsCreating(false);
     }
 
+    const endFollow = () => {
+        socket.emit('end_follow', { arrayReceived: notelistReceived, arraySubmit: notelist });
+        setIsFollowing(false);
+        setNotelist([]);
+        setNotelistReceived([]);
+    }
+    
     const endTurn = () => {
         socket.emit('end_turn', { arrayReceived: notelistReceived, arraySubmit: notelist });
         setIsFollowing(false);
+        setNotelist([]);
         setNotelistReceived([]);
     };
 
-    // Socket event for
     useEffect(() => {
         // Starting the game after both are ready
         socket.on('start_game', (data) => {
         setNotelist([]);
+        setNotelistReceived([]);
         setIsCreating(true);
         });
 
         socket.on('start_turn', (data) => {
         setNotelist([]);
+        setNotelistReceived([]);
         setIsCreating(true);
         });
 
         socket.on('next_round', (data) =>{
         setRound(data.round);
+        setNotelist([]);
+        setNotelistReceived([]);
         });
 
         socket.on('start_follow', () => {
         setNotelist([]);
-        // setNotelistReceived([]);
         console.log('start_follow');
         setIsFollowing(true);
         });
@@ -68,7 +88,6 @@ function Piano3() {
 
     return (
         <>
-            <Score />
             <p>Create a pattern:
             <Countdown
                 key={`create_${round}`}
@@ -98,25 +117,29 @@ function Piano3() {
                 ))}
             </div>
 
-            <h1>Display</h1>
-            <div className="piano-container">
+            <h3>Display</h3>
+            <div>
                 {notelist.map((item) => (
-                    <div key={item.id}>
-                        <div>{item.note}</div>
+                    <div className="display-note" key={item.id}>
+                        {item.note}
                     </div>
                 ))}
             </div>            
 
-            <h1>Received</h1>
-            <div className="piano-container">
-                {notelistReceived.map((item) => (
-                    <div key={item.id}>
-                        <div>{item.note}</div>
+            <h3>Received</h3>
+            <div>
+                {!isFollowing && (<>
+                    {notelistReceived.map((item) => (
+                    <div className="display-note" key={item.id}>
+                        {item.note}
                     </div>
-                ))}
+                ))}</>)
+                
+                }
+                
             </div>
         </>
-    );
+    )
 }
 
-export default Piano3;
+export default Pianov2

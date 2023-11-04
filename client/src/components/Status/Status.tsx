@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import socket from '../../socket';
+import './Status.css'
 
 function Status() {
-
     const [isReady, setIsReady] = useState(false); // data from the server
+    const [score, setScore] = useState(0);
     const [tie, setTie] = useState(false);
     const [winner, setWinner] = useState<string>();
 
@@ -20,19 +21,23 @@ function Status() {
         socket.on('ready_state', (data) => {
             setIsReady(data);
         });
-        
+
+        socket.on('score', (data) => {
+            setScore(data)
+        })
+
         socket.on('tie', (data) => {
             setTie(data);
         })
 
         socket.on('winner', (data) => {
             console.log(data)
-            // setWinner(data)
+            setWinner(data)
         })
     }, [socket]);
 
     return (
-        <div>
+        <>
             {isReady ? (
             <p>"Waiting for the other player to be ready..."</p>
             ) : ( 
@@ -45,7 +50,10 @@ function Status() {
             )}
             <p></p>
             <button onClick={handleRestart}>Restart</button>
-        </div>
+            <p>score: {score}</p>
+            <p>{tie ? 'tie' : 'not tie'}</p>
+            <p>winner: {winner}</p>
+        </>
     )
 }
 

@@ -1,13 +1,9 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 
-import User from "./components/User";
-import Score from "./components/Score";
-import Welcome from "./pages/Welcome";
-import { Route, Routes } from "react-router-dom";
-import Room from "./pages/Room";
-import Player from "./pages/RoomComponent.tsx/Player";
+import Room from "./pages/Room/Room";
+import Home from "./pages/Home/Home";
 
 
 function App() {
@@ -16,16 +12,11 @@ function App() {
             <div className="tab">
                 DupMe
             </div>
-            <Player />
-            {/* <Routes>
-                <Route path='/' element={ <Welcome /> } />
+            {/* <Player /> */}
+            <Routes>
+                <Route path='/' element={ <Home /> } />
                 <Route path='/room' element={ <Room /> } />
-            </Routes> */}
-            
-            {/* <User /> */}
-            {/* <Welcome/> */}
-            {/* <Room /> */}
-            {/* <Score /> */}
+            </Routes>
         </div>
     );
 }
