@@ -6,16 +6,8 @@ import Piano from "../../components/Piano/Piano";
 import './Room.css'
 
 function Room() {
-    const navigate = useNavigate();
-    const handleLeave = () => {
-        socket.emit('leave_room');
-        // console.log("leave_room");
-        navigate('/')
-    };
     return (<>
         <h2>Room</h2>
-        <button onClick={handleLeave}>leave this room</button>
-
         <div className='player-container'>
             <div className='playerA'>
                 <div>name a</div>

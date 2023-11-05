@@ -24,7 +24,7 @@
 
 .player-container {
     display: grid;
-    background-color: aqua;
+    /* background-color: aqua; */
     grid-template-areas: 
         'playerA status status playerB'
         'piano piano piano piano';

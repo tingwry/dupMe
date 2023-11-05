@@ -49,7 +49,7 @@ export function gameHandler(io: Server, socket: Socket): void {
 
             // check if tie
             if (playersInRoom[0].score === playersInRoom[1].score) {
-                tie = true;
+                // tie = true;
                 console.log("this match is a tie");
 
                 playersInRoom.forEach((playerInRoom) => {
@@ -58,7 +58,8 @@ export function gameHandler(io: Server, socket: Socket): void {
                     playerInRoom.P1 = false;
                 });
 
-                io.to(roomId).emit('tie', tie);
+                io.to(roomId).emit('tie', true);
+                io.to(roomId).emit('end_game', { tie: true, winner: "none" })
             } else {
                 const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
                 console.log("max score:", maxScore);
@@ -68,17 +69,18 @@ export function gameHandler(io: Server, socket: Socket): void {
                         winner = playerInRoom;
                         console.log("winner: ", winner.name);
 
-                        playerInRoom.score = 0;
-                        playerInRoom.ready = false;
+                        // playerInRoom.score = 0;
+                        // playerInRoom.ready = false;
                         playerInRoom.P1 = true;
                     } else {
-                        playerInRoom.score = 0;
-                        playerInRoom.ready = false;
+                        // playerInRoom.score = 0;
+                        // playerInRoom.ready = false;
                         playerInRoom.P1 = false;
                     }
                 }
 
                 io.to(roomId).emit('winner', winner.name);
+                io.to(roomId).emit('end_game', { tie: false, winner: winner.name})
             }
 
             // io.to(roomId).emit('ready_state', false);
@@ -202,7 +204,7 @@ export function gameHandler(io: Server, socket: Socket): void {
         playersInRoom.forEach((playerInRoom) => {
             playerInRoom.score = 0;
             playerInRoom.ready = false;
-            playerInRoom.P1 = false;
+            // playerInRoom.P1 = false;
         });
 
         rooms[roomIndex].round = 0;
