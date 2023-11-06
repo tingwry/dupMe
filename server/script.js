@@ -4,7 +4,7 @@
 
 const socket = io(':3000');
 
-function user()  {
+function user() {
     console.log(users)
     const count = users.length;
     const playerCountElement = document.getElementById('player-count');
@@ -19,7 +19,7 @@ function refreshUsers() {
 
 function serverRestart(roomId) {
     console.log(`${roomId} restart`);
-    socket.emit('server_restart', {roomId: roomId});
+    socket.emit('server_restart', { roomId: roomId });
 }
 
 socket.on('users', (data) => {

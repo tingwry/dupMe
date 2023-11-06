@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import socket from '../../socket'
 import './Player.css'
 
-function PlayerB() {
+function Opponent() {
     const [name, setName] = useState<string>('');
     const [score, setScore] = useState(0);
     useEffect(() => {
@@ -29,4 +29,4 @@ function PlayerB() {
     </>)
 }
 
-export default PlayerB
+export default Opponent
