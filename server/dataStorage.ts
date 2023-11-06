@@ -16,3 +16,5 @@ export let rooms: {
     {roomId: "room 2", round: 1, players: 0},
     {roomId: "room 3", round: 1, players: 0},
 ];
+
+export let serverSocket: string = "";

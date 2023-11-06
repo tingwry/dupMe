@@ -4,19 +4,19 @@ import Status from "../../components/Status/Status";
 import Piano from "../../components/Piano/Piano";
 
 import './Room.css'
-import PlayerA from "../../components/Player/PlayerA";
-import PlayerB from "../../components/Player/PlayerB";
+import Me from "../../components/Player/Me";
+import Opponent from "../../components/Player/Opponent";
 
 function Room() {
     return (<>
         <h2>Room</h2>
         <div className='player-container'>
-            <div className='playerA'>
-                <PlayerA />
+            <div className='me'>
+                <Me />
             </div>
             <div className='status'><Status /></div>
-            <div className='playerB'>
-                <PlayerB />
+            <div className='opponent'>
+                <Opponent />
             </div>
             <div className='piano'><Piano /></div>
         </div>
