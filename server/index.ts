@@ -41,8 +41,8 @@ import { users } from "./dataStorage";
 io.on('connection', (socket) => {  
     console.log(`Boombayah welcome: ${socket.id}`)
     userHandler(io, socket);
+    roomHandler(io, socket);
     if (users.length !== 0) {
-        roomHandler(io, socket);
         gameHandler(io, socket);
     }
     // gameHandler3(io, socket);

@@ -3,7 +3,6 @@ import { users, rooms } from "../dataStorage";
 import { findPlayer } from "./playerController";
 
 export function roomHandler(io: Server, socket: Socket): void {
-    console.log('roomHandler')
     const joinRoom = (roomId: string) => {
         socket.join(roomId);
         console.log(`${socket.id} join_room ${roomId}`);
