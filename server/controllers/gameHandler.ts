@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 
 export function gameHandler(io: Server, socket: Socket): void {
+    console.log('gameHandler')
     // Controllers
     const info = () => {
         const userIndex = users.findIndex((user) => user.sid === socket.id);
