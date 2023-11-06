@@ -1,6 +1,7 @@
 export let users: {
     sid: string, 
     name: string, 
+    avatar: string,
     roomId: string, 
     score: number, 
     ready: boolean, 

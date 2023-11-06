@@ -3,10 +3,12 @@ import { users, rooms } from "../dataStorage";
 import { updatePlayerInRoom } from "./playerController";
 
 export function userHandler(io: Server, socket: Socket): void {
-    const submitName = (name: string) => {
+    const submitName = (data: any) => {
+
         const user = {
             sid: socket.id, 
-            name: name, 
+            name: data.name, 
+            avatar: data.avatar,
             roomId: "main", 
             score: 0, 
             ready: false, 
@@ -14,6 +16,7 @@ export function userHandler(io: Server, socket: Socket): void {
         };
         users.push(user);
 
+        console.log(user);
         console.log(`user connected: ${socket.id}`);
         console.log(`connected users: ${users.length}`);
 
