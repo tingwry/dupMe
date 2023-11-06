@@ -1,0 +1,47 @@
+.piano-container {
+    margin-top: 20px;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: row;
+    /* background-color: blue; */
+    align-content: center;
+    justify-content: center;
+}
+
+.piano-container > div {
+    background-color: white;
+    height: 145px;
+    width: 60px;
+    border: 3px solid var(--beige);
+
+    position: relative;
+    color: black;
+    font-weight: 400;
+    font-size: 20px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 5px;
+}
+
+.piano-container > div:active {
+    background-color: var(--brick);
+    color: var(--white);
+}
+
+.countdown {
+    height: 1.5em;
+    margin: 0;
+}
+
+.display {
+    height: 70px;
+    margin: 0;
+}
+
+.display-note {
+    display: inline;
+    margin: 0 5px 10px;
+}
