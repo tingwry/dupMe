@@ -16,6 +16,14 @@ function Piano() {
   const [followDuration, setFollowDuration] = useState(7);
   const [isFollowing, setIsFollowing] = useState(false);
 
+  // Select sound
+  const allSounds = ["default", "cat"];
+  const [sound, setSound] = useState("default");
+
+  const handleClickSound = (item: string) => {
+    setSound(item);
+  };
+
   // Click note
   const handleClickNote = (item: string) => {
     if (isCreating || isFollowing) {
@@ -24,8 +32,13 @@ function Piano() {
       setNotelist(updatedNotelist);
       socket.emit("send_notelist", { notelist: updatedNotelist });
 
-      const audio = new Audio(`sounds/${item}.mp3`);
-      audio.play();
+      if (sound == "default") {
+        const audio = new Audio(`sounds/${item}.mp3`);
+        audio.play();
+      } else if (sound == "cat") {
+        const audio = new Audio(`sounds_cat/${item}_cat.mp3`);
+        audio.play();
+      }
     }
   };
 
@@ -75,6 +88,20 @@ function Piano() {
 
   return (
     <>
+      <div>
+        {allSounds.map((item) => (
+          <button
+            className="sound-button"
+            key={item}
+            onClick={() => {
+              handleClickSound(item);
+            }}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+
       <div className="countdown">
         Create a pattern:
         <Countdown

@@ -45,3 +45,17 @@
     display: inline;
     margin: 0 5px 10px;
 }
+
+.sound-button {
+    font-family: 'Press Start 2P', 'Prompt',sans-serif;
+    font-size: 10px;
+    background-color: coral;
+    color: white;
+    border-color: white;
+  }
+
+  .sound-button:hover {
+    background-color: white;
+    color: coral;
+    border-color: coral;
+  }
