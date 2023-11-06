@@ -88,7 +88,7 @@ export function gameHandler(io: Server, socket: Socket): void {
 
     // const readySetGo = (sid: string, roomId: string, round: number, onTimeout: () => void) => {
     const readySetGo = (sid: string, roomId: string, round: number) => {
-        let currentTime = 5;
+        let currentTime = 4;
         const interval = setInterval(() => {
             if (currentTime === 0) {
                 io.to(sid).emit('rsg', { message: "Your turn" });
