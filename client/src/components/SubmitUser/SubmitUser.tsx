@@ -14,15 +14,13 @@ function SubmitUser() {
     socket.connect();
   };
   return (
-    <>
+    <> 
       <p>
-        <div style={{ margin: "100px" }}>
-          <img
-            style={{ width: "189px", height: "189px" }}
-            src={Avatar1Image}
-            alt="avatar1"
-          />
-        </div>
+        <img
+          style={{ width: "189px", height: "189px", flexWrap: "wrap" }}
+          src={Avatar1Image}
+          alt="avatar1"
+        />
       </p>
       <input
         type="text"
