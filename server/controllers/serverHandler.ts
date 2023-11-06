@@ -21,9 +21,9 @@ export function serverHandler(io: Server, socket: Socket): void {
         io.emit('users', users)
     }
 
-    const serverRestartRoom = (roomId: string) => {
-        console.log(`serverRestart ${roomId}`);
-        console.log(roomId)
+    const serverRestartRoom = (data: any) => {
+        console.log(`serverRestart ${data.roomId}`);
+        const roomId = data.roomId;
         const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
         const playersInRoom = users.filter((user) => user.roomId === roomId);
     
