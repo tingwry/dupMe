@@ -9,8 +9,11 @@ function Piano() {
   const [notelistReceived, setNotelistReceived] = useState<
     { id: number; note: string }[]
   >([]);
+  const [round, setRound] = useState(0);
 
+  const [createDuration, setCreateDuration] = useState(5);
   const [isCreating, setIsCreating] = useState(false);
+  const [followDuration, setFollowDuration] = useState(7);
   const [isFollowing, setIsFollowing] = useState(false);
 
   // Click note
@@ -26,19 +29,27 @@ function Piano() {
     }
   };
 
-  useEffect(() => {
-    socket.on("receive_notelist", (data) => {
-      setNotelistReceived(data.notelist);
-    });
+  const endCreate = () => {
+    socket.emit("end_create");
+    setIsCreating(false);
+  };
 
+  const endFollow = () => {
+    socket.emit("end_follow", { arrayR: notelistReceived, arrayS: notelist });
+    setNotelist([]);
+    setNotelistReceived([]);
+    setIsFollowing(false);
+  };
+
+  useEffect(() => {
     socket.on("start_create", (data) => {
       setNotelist([]);
       setNotelistReceived([]);
       setIsCreating(true);
     });
 
-    socket.on("end_create", (data) => {
-      setIsCreating(false);
+    socket.on("receive_notelist", (data) => {
+      setNotelistReceived(data.notelist);
     });
 
     socket.on("start_follow", () => {
@@ -46,19 +57,16 @@ function Piano() {
       setIsFollowing(true); // also hide the received note
     });
 
-    socket.on("end_follow", () => {
-      socket.emit("end_turn", { arrayR: notelistReceived, arrayS: notelist });
-      setIsFollowing(false);
-    });
-
     socket.on("start_turn", (data) => {
       setNotelist([]);
       setNotelistReceived([]);
+      setRound(data.round);
     });
 
     socket.on("restart", (data) => {
       setNotelist([]);
       setNotelistReceived([]);
+      setRound(data.round);
       setIsCreating(false);
       setIsFollowing(false);
       console.log("restart");
@@ -67,6 +75,25 @@ function Piano() {
 
   return (
     <>
+      <div className="countdown">
+        Create a pattern:
+        <Countdown
+          key={`create_${round}`}
+          duration={createDuration}
+          running={isCreating}
+          onTimeout={endCreate}
+        />
+      </div>
+
+      <div className="countdown">
+        Follow the pattern:
+        <Countdown
+          key={`follow_${round}`}
+          duration={followDuration}
+          running={isFollowing}
+          onTimeout={endFollow}
+        />
+      </div>
       <div className="display">
         <h3>Display</h3>
         {notelist.map((item) => (

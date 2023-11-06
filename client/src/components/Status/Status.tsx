@@ -10,7 +10,6 @@ function Status() {
     const [playing, setPlaying] = useState(false);
     const [afterMatch, setIsAfterMatch] = useState(false);
     const [message, setMessage] = useState("")
-    const [countdown, setCoundown] = useState<number>();
     
     const [round, setRound] = useState(0);
     const [tie, setTie] = useState(false);
@@ -41,25 +40,16 @@ function Status() {
             setIsReady(data);
         });
 
+        socket.on('start_turn', (data) => {
+            setPlaying(true);
+        })
+
         socket.on('score', (data) => {
-            setScore(data);
+            setScore(data)
         })
 
         socket.on('rsg', (data) => {
-            setMessage(data.message);
-        })
-
-        socket.on('countdown', (data) => {
-            setCoundown(data.countdown);
-        })
-
-        socket.on('start_create', () => {
-            setPlaying(true);
-            setMessage("Your Turn to create a pattern")
-        })
-
-        socket.on('start_follow', () => {
-            setMessage("Your Turn to follow the pattern")
+            setMessage(data.message)
         })
 
         socket.on('end_game', (data) => {
@@ -89,10 +79,9 @@ function Status() {
             {playing ? (<>
                 <h3>{message}</h3>
                 <p>score: {score}</p>
-                <p>{countdown}</p>
             </>) : (<>
                 {afterMatch ? (<>
-                    <h3>{result}</h3>
+                    <p>{result}</p>
                     {/* <p>{tie ? 'tie' : 'not tie'}</p>
                     <p>winner: {winner}</p> */}
                     <button onClick={handleRestart}>Restart</button>
