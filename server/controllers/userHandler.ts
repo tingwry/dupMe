@@ -4,7 +4,6 @@ import { updatePlayerInRoom } from "./playerController";
 
 export function userHandler(io: Server, socket: Socket): void {
     const submitName = (data: any) => {
-
         const user = {
             sid: socket.id, 
             name: data.name, 
@@ -16,13 +15,13 @@ export function userHandler(io: Server, socket: Socket): void {
         };
         users.push(user);
 
-        console.log(user);
         console.log(`user connected: ${socket.id}`);
         console.log(`connected users: ${users.length}`);
 
         // Send the list of all connected users to the client
         io.emit('users', users);
         io.emit('rooms', rooms);
+        socket.emit('profile', { name: data.name, avatar: data.avatar })
     }
 
     const disconnect = () => {

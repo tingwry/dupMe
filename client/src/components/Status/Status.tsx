@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import socket from '../../socket';
-import './Status.css'
 import { useNavigate } from 'react-router-dom';
-import ReadySetGo from '../ReadySetGo';
+import './Status.css'
 
 function Status() {
     const [isReady, setIsReady] = useState(false); // data from the server

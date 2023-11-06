@@ -2,15 +2,15 @@ import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import socket from "../../socket";
 import { AvatarGenerator } from "random-avatar-generator";
 
-function NameInput(avatar: { avatar: string }) {
+function NameInput({ avatar }: { avatar: string }) {
   const [name, setName] = useState<string>("");
-  const generator = new AvatarGenerator();
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
 
   const handleSubmitName = () => {
+    
     socket.emit("submit_name", { name: name, avatar: avatar });
     socket.connect();
   };
