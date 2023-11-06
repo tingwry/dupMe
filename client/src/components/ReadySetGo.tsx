@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 
 interface Props {
+    message: string;
     running: boolean;
     onTimeout: () => void; 
 }
 
-function ReadySetGo({ running, onTimeout }: Props) {
-    const [count, setCount] = useState(3);
+function ReadySetGo({ message, running, onTimeout }: Props) {
+    const [count, setCount] = useState(5);
     const [text, setText] = useState('Ready');
 
     useEffect(() => {
@@ -30,6 +31,8 @@ function ReadySetGo({ running, onTimeout }: Props) {
             setText("Go");
         } else if (count === 2) {
             setText("Set");
+        } else if (count === 3) {
+            setText("Ready")
         }
       }, [count]);
 

@@ -23,9 +23,6 @@ export function userHandler(io: Server, socket: Socket): void {
     }
 
     const disconnect = () => {
-        console.log(`User disconnected: ${socket.id}`);
-        console.log(`connected users: ${users.length}`);
-
         const userIndex = users.findIndex((user) => user.sid === socket.id);
         if (userIndex !== -1) {
             const previousRoomId = users[userIndex].roomId;
@@ -36,8 +33,10 @@ export function userHandler(io: Server, socket: Socket): void {
             io.emit('users', users);
             io.emit('rooms', rooms);
         } else {
-            console.log("User not found");
+            console.log("disconnect: User not found");
         }
+        console.log(`User disconnected: ${socket.id}`);
+        console.log(`connected users: ${users.length}`);
     }
 
     socket.on('submit_name', submitName);

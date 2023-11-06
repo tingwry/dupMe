@@ -10,13 +10,12 @@ function Status() {
 
     const [playing, setPlaying] = useState(false);
     const [afterMatch, setIsAfterMatch] = useState(false);
+    const [message, setMessage] = useState("")
     
+    const [round, setRound] = useState(0);
     const [tie, setTie] = useState(false);
     const [winner, setWinner] = useState<string>();
     const [result, setResult] = useState<string>();
-
-    const [isMyTurn, setIsMyTurn] = useState(false);
-    const [isFollowing, setIsFollowing] = useState(false);
     
     const navigate = useNavigate();
     const handleLeave = () => {
@@ -33,6 +32,10 @@ function Status() {
         socket.emit('client-restart')
     }
 
+    const handleReadySetGoTimeout = () => {
+
+    }
+
     useEffect(() => {
         socket.on('ready_state', (data) => {
             setIsReady(data);
@@ -46,14 +49,9 @@ function Status() {
             setScore(data)
         })
 
-        // socket.on('tie', (data) => {
-        //     setTie(data);
-        // })
-
-        // socket.on('winner', (data) => {
-        //     console.log(data)
-        //     setWinner(data)
-        // })
+        socket.on('rsg', (data) => {
+            setMessage(data.message)
+        })
 
         socket.on('end_game', (data) => {
             // combine tie and winner
@@ -72,13 +70,15 @@ function Status() {
         socket.on('restart', (data) => {
             setPlaying(false);
             setIsAfterMatch(false);
+            setTie(false)
+            setWinner('')
         })
     }, [socket]);
 
     return (
         <>
             {playing ? (<>
-                {/* <ReadySetGo key={isMyTurn} /> */}
+                <h3>{message}</h3>
                 <p>score: {score}</p>
             </>) : (<>
                 {afterMatch ? (<>

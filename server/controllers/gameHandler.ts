@@ -59,7 +59,7 @@ export function gameHandler(io: Server, socket: Socket): void {
                     playerInRoom.P1 = false;
                 });
 
-                io.to(roomId).emit('tie', true);
+                // io.to(roomId).emit('tie', true);
                 io.to(roomId).emit('end_game', { tie: true, winner: "none" })
             } else {
                 const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
@@ -76,7 +76,7 @@ export function gameHandler(io: Server, socket: Socket): void {
                     }
                 }
 
-                io.to(roomId).emit('winner', winner.name);
+                // io.to(roomId).emit('winner', winner.name);
                 io.to(roomId).emit('end_game', { tie: false, winner: winner.name})
             }
 
@@ -84,6 +84,32 @@ export function gameHandler(io: Server, socket: Socket): void {
         } else {
             console.log("there's some errorrrrrr");
         }
+    }
+
+    // const readySetGo = (sid: string, roomId: string, round: number, onTimeout: () => void) => {
+    const readySetGo = (sid: string, roomId: string, round: number) => {
+        let currentTime = 5;
+        const interval = setInterval(() => {
+            if (currentTime === 0) {
+                io.to(sid).emit('rsg', { message: "Your turn" });
+                // onTimeout();
+                startCreate(sid, roomId, round)
+                clearInterval(interval);
+            } else if (currentTime === 1) {
+                io.to(sid).emit('rsg', { message: "Go" });
+                currentTime--;
+            } else if (currentTime === 2) {
+                io.to(sid).emit('rsg', { message: "Set" });
+                currentTime--;
+            } else if (currentTime === 3) {
+                io.to(sid).emit('rsg', { message: "Ready" });
+                currentTime--;
+            } else {
+                io.to(sid).emit('rsg', { message: `Round ${round}` });
+                currentTime--;
+            }
+
+        }, 1000);
     }
 
     // For socket
@@ -178,12 +204,14 @@ export function gameHandler(io: Server, socket: Socket): void {
                 // console.log(`end_round ${roomId} ${rooms[roomIndex].round}`);
                 rooms[roomIndex].round++;
                 const round = rooms[roomIndex].round;
-                startCreate(socket.id, roomId, round);
+                readySetGo(socket.id, roomId, round);
+                // startCreate(socket.id, roomId, round);
             }
         } else { // is not P1 = always start the next turn
             // console.log(`end_turn ${roomId} ${rooms[roomIndex].round}`);
             const round = rooms[roomIndex].round;
-            startCreate(socket.id, roomId, round);
+            readySetGo(socket.id, roomId, round)
+            // startCreate(socket.id, roomId, round);
         }
     }
 

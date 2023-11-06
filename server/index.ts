@@ -42,9 +42,6 @@ io.on('connection', (socket) => {
     console.log(`Boombayah welcome: ${socket.id}`)
     userHandler(io, socket);
     roomHandler(io, socket);
-    // if (users.length !== 0) {
-    //     gameHandler(io, socket);
-    // }
     gameHandler(io, socket);
     serverHandler(io, socket);
 })
