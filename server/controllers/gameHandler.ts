@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 import { updatePlayerInRoom } from "./playerController";
+import { countdown } from "./gameController";
 
 export function gameHandler(io: Server, socket: Socket): void {
     // Controllers
@@ -22,10 +23,44 @@ export function gameHandler(io: Server, socket: Socket): void {
         }
     }
 
-    const startCreate = (sid: string, roomId: string, round: number) => {
-        io.to(sid).emit('start_create');
-        io.to(roomId).emit('start_turn', { round: round }); // to reset timer
-        console.log(`round ${round}`)
+    const readySetGo = (roomId: string, round: number, onTimeout: () => void) => {
+    // const readySetGo = (sid: string, roomId: string, round: number) => {
+        let currentTime = 4;
+        const interval = setInterval(() => {
+            if (currentTime === 0) {
+                io.to(roomId).emit('rsg', { message: "" });
+                onTimeout();
+                clearInterval(interval);
+            } else if (currentTime === 1) {
+                io.to(roomId).emit('rsg', { message: "Go" });
+                currentTime--;
+            } else if (currentTime === 2) {
+                io.to(roomId).emit('rsg', { message: "Set" });
+                currentTime--;
+            } else if (currentTime === 3) {
+                io.to(roomId).emit('rsg', { message: "Ready" });
+                currentTime--;
+            } else {
+                io.to(roomId).emit('rsg', { message: `Round ${round}` });
+                currentTime--;
+            }
+        }, 1000);
+    }
+
+    const startCreate = (createsid: any, followsid: any, roomId: string, round: number) => {
+        io.to(createsid).emit('start_create');
+        console.log(`round ${round}`);
+
+        // countDown in server
+        countdown(io, socket, roomId, 5, () => endCreate(createsid, followsid, roomId));
+    }
+
+    const endCreate = (createsid: any, followsid: any, roomId: string) => {
+        io.to(createsid).emit('end_create');
+        io.to(followsid).emit('start_follow');
+        countdown(io, socket, roomId, 5, () => {
+            io.to(followsid).emit('end_follow');
+        });
     }
 
     const scoring = (arrayR: { id: number; note: string }[], arrayS: { id: number; note: string }[]) => {
@@ -44,13 +79,11 @@ export function gameHandler(io: Server, socket: Socket): void {
         const playersInRoom = users.filter((user) => user.roomId === roomId);
 
         let winner = playersInRoom[0];
-        let tie = false;
 
         if (playersInRoom[0] && playersInRoom[1]) {
 
             // check if tie
             if (playersInRoom[0].score === playersInRoom[1].score) {
-                // tie = true;
                 console.log("this match is a tie");
 
                 playersInRoom.forEach((playerInRoom) => {
@@ -59,7 +92,6 @@ export function gameHandler(io: Server, socket: Socket): void {
                     playerInRoom.P1 = false;
                 });
 
-                // io.to(roomId).emit('tie', true);
                 io.to(roomId).emit('end_game', { tie: true, winner: "none" })
             } else {
                 const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
@@ -76,40 +108,12 @@ export function gameHandler(io: Server, socket: Socket): void {
                     }
                 }
 
-                // io.to(roomId).emit('winner', winner.name);
                 io.to(roomId).emit('end_game', { tie: false, winner: winner.name})
             }
 
-            // io.to(roomId).emit('ready_state', false);
         } else {
             console.log("there's some errorrrrrr");
         }
-    }
-
-    // const readySetGo = (sid: string, roomId: string, round: number, onTimeout: () => void) => {
-    const readySetGo = (sid: string, roomId: string, round: number) => {
-        let currentTime = 5;
-        const interval = setInterval(() => {
-            if (currentTime === 0) {
-                io.to(sid).emit('rsg', { message: "Your turn" });
-                // onTimeout();
-                startCreate(sid, roomId, round)
-                clearInterval(interval);
-            } else if (currentTime === 1) {
-                io.to(sid).emit('rsg', { message: "Go" });
-                currentTime--;
-            } else if (currentTime === 2) {
-                io.to(sid).emit('rsg', { message: "Set" });
-                currentTime--;
-            } else if (currentTime === 3) {
-                io.to(sid).emit('rsg', { message: "Ready" });
-                currentTime--;
-            } else {
-                io.to(sid).emit('rsg', { message: `Round ${round}` });
-                currentTime--;
-            }
-
-        }, 1000);
     }
 
     // For socket
@@ -132,7 +136,7 @@ export function gameHandler(io: Server, socket: Socket): void {
 
             if (bothPlayersReady) {
                 let firstPlayerSocketId = playersInRoom.find((player) => player.P1)?.sid
-                if (firstPlayerSocketId === undefined) {
+                if (!firstPlayerSocketId) {
                     firstPlayerSocketId = Math.random() < 0.5 ? playersInRoom[0].sid : playersInRoom[1].sid;
     
                     // update P1 to true for the person who goes first
@@ -145,10 +149,16 @@ export function gameHandler(io: Server, socket: Socket): void {
 
                 rooms[roomIndex].round = 1;
                 const round = rooms[roomIndex].round;
-                startCreate(firstPlayerSocketId, roomId, round);
+
+                let secondPlayerSocketId = playersInRoom.find((player) => !player.P1)?.sid
+                if (firstPlayerSocketId && secondPlayerSocketId) {
+                    readySetGo(roomId, round, () => {
+                        startCreate(firstPlayerSocketId, secondPlayerSocketId, roomId, round)
+                    })
+                }
             }
         } else {
-            console.log('waiting for another player')
+            console.log('Waiting for another player')
         }
     }
 
@@ -161,20 +171,9 @@ export function gameHandler(io: Server, socket: Socket): void {
         const roomIndex = userInfo.roomIndex;
 
         socket.to(roomId).emit('receive_notelist', data);
-    }
+    } 
 
-    const endCreate = () => {
-        // Info
-        const userInfo = info();
-        const sid = socket.id
-        const userIndex = userInfo.userIndex;
-        const roomId = userInfo.roomId;
-        const roomIndex = userInfo.roomIndex;
-
-        socket.to(roomId).emit('start_follow');
-    }
-
-    const endFollow = (data: any) => {
+    const endTurn = (data: any) => {
         // Info
         const userInfo = info();
         const sid = socket.id
@@ -194,25 +193,26 @@ export function gameHandler(io: Server, socket: Socket): void {
         io.to(roomId).emit('score', addScore);
         updatePlayerInRoom(io, socket, roomId);
 
+        const p1 = users.find((user) => {(user.P1) && (user.roomId === roomId)})
+        const p2 = users.find((user) => {!(user.P1) && (user.roomId === roomId)})
+
         // check ending
-        if (users[userIndex].P1) { // If is P1
-            if (rooms[roomIndex].round === 2) { // Round 2 = end game
-                // console.log(`end_game ${roomId} ${rooms[roomIndex].round}`);
-                rooms[roomIndex].round = 0;
-                winner(roomId);
-            } else { // Round 1 = continues
-                // console.log(`end_round ${roomId} ${rooms[roomIndex].round}`);
-                rooms[roomIndex].round++;
+        if (p1 && p2) {
+            if (socket.id === p1.sid) { // If is P1
+                if (rooms[roomIndex].round === 2) { // Round 2 = end game
+                    rooms[roomIndex].round = 0;
+                    winner(roomId);
+                } else { // Round 1 = continues
+                    rooms[roomIndex].round++;
+                    const round = rooms[roomIndex].round;
+                    readySetGo(roomId, round, () => startCreate(p1.sid, p2.sid, roomId, round));
+                }
+            } else { // is not P1 = always start the next turn
                 const round = rooms[roomIndex].round;
-                readySetGo(socket.id, roomId, round);
-                // startCreate(socket.id, roomId, round);
+                readySetGo(roomId, round, () => startCreate(p2.sid, p1.sid, roomId, round))
             }
-        } else { // is not P1 = always start the next turn
-            // console.log(`end_turn ${roomId} ${rooms[roomIndex].round}`);
-            const round = rooms[roomIndex].round;
-            readySetGo(socket.id, roomId, round)
-            // startCreate(socket.id, roomId, round);
         }
+        
     }
 
     const clientRestart = () => {
@@ -244,6 +244,7 @@ export function gameHandler(io: Server, socket: Socket): void {
     socket.on('ready', ready);
     socket.on('send_notelist', sendNoteList);
     socket.on('end_create', endCreate);
-    socket.on('end_follow', endFollow);
+    // socket.on('end_follow', endFollow);
+    socket.on('end_turn', endTurn);
     socket.on('client-restart', clientRestart);
 }

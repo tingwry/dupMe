@@ -1,23 +1,23 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 
-// export function info(io: Server, socket: Socket) {
-//     const userIndex = users.findIndex((user) => user.sid === socket.id);
-//     if (userIndex !== -1) {
-//         const roomId = users[userIndex].roomId;
-//         const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
+export function playerInfo(io: Server, socket: Socket) {
+    const userIndex = users.findIndex((user) => user.sid === socket.id);
+    if (userIndex !== -1) {
+        const roomId = users[userIndex].roomId;
+        const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
 
-//         if (roomIndex !== -1) {
-//             return { status: true, result: {userIndex: userIndex, roomId: roomId, roomIndex: roomIndex}};
-//         } else {
-//             console.log("Room not found")
-//             return {status: false, result: "Room not found"}
-//         }
-//     } else {
-//         console.log("User not found")
-//         return {status: false, result: "User not found"}
-//     }
-// }
+        if (roomIndex !== -1) {
+            return { userIndex: userIndex, roomId: roomId, roomIndex: roomIndex };
+        } else {
+            console.log("Room not found")
+            return { userIndex: userIndex, roomId: roomId, roomIndex: null }
+        }
+    } else {
+        console.log("User not found")
+        return { userIndex: null, roomId: null, roomIndex: null }
+    }
+}
 
 export function updatePlayerInRoom(io: Server, socket: Socket, roomId: string): void {
     const me = users.find((user) => (user.roomId === roomId) && (user.sid === socket.id));
