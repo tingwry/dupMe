@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
+import { updatePlayerInRoom } from "./playerController";
 
 export function gameHandler(io: Server, socket: Socket): void {
     // Controllers
@@ -160,7 +161,7 @@ export function gameHandler(io: Server, socket: Socket): void {
         const roomId = userInfo.roomId;
         const roomIndex = userInfo.roomIndex;
 
-        const playersInRoom = users.filter((user) => user.roomId === roomId);
+        // const playersInRoom = users.filter((user) => user.roomId === roomId);
         const arrayR = data.arrayR;
         const arrayS = data.arrayS;
         
@@ -170,7 +171,7 @@ export function gameHandler(io: Server, socket: Socket): void {
         console.log(`${users[userIndex].name} add ${addScore} = ${users[userIndex].score}`);
 
         io.to(roomId).emit('score', addScore);
-        io.to(roomId).emit('players_in_room', playersInRoom);
+        updatePlayerInRoom(io, socket, roomId);
 
         // check ending
         if (users[userIndex].P1) { // If is P1
@@ -204,13 +205,14 @@ export function gameHandler(io: Server, socket: Socket): void {
         playersInRoom.forEach((playerInRoom) => {
             playerInRoom.score = 0;
             playerInRoom.ready = false;
-            // playerInRoom.P1 = false;
         });
 
         rooms[roomIndex].round = 0;
 
+        io.to(roomId).emit('score', 0);
+        updatePlayerInRoom(io, socket, roomId);
+
         io.to(roomId).emit('restart', { round: 0 });
-        io.to(roomId).emit('players_in_room', playersInRoom);
         io.to(roomId).emit('ready_state', false);
 
         console.log(`client restart ${roomId}`)

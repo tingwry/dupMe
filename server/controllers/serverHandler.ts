@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
+import { serverUpdatePlayerInRoom } from "./playerController";
 
 export function serverHandler(io: Server, socket: Socket): void {
     const serverUsers = () => {
@@ -13,6 +14,7 @@ export function serverHandler(io: Server, socket: Socket): void {
         const roomIndex = rooms.findIndex((room) => room.roomId === roomId);
         const playersInRoom = users.filter((user) => user.roomId === roomId);
 
+        // set new properties
         playersInRoom.forEach((playerInRoom) => {
             playerInRoom.score = 0;
             playerInRoom.ready = false;
@@ -21,8 +23,9 @@ export function serverHandler(io: Server, socket: Socket): void {
 
         rooms[roomIndex].round = 0;
 
+        // send info to client
+        serverUpdatePlayerInRoom(io, socket, roomId)
         io.to(roomId).emit('restart', { round: 0 });
-        io.to(roomId).emit('players_in_room', playersInRoom);
         io.to(roomId).emit('ready_state', false);
     }
 
