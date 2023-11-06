@@ -70,12 +70,8 @@ export function gameHandler(io: Server, socket: Socket): void {
                         winner = playerInRoom;
                         console.log("winner: ", winner.name);
 
-                        // playerInRoom.score = 0;
-                        // playerInRoom.ready = false;
                         playerInRoom.P1 = true;
                     } else {
-                        // playerInRoom.score = 0;
-                        // playerInRoom.ready = false;
                         playerInRoom.P1 = false;
                     }
                 }
@@ -128,7 +124,6 @@ export function gameHandler(io: Server, socket: Socket): void {
         } else {
             console.log('waiting for another player')
         }
-        
     }
 
     const sendNoteList = (data: any) => {
