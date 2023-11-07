@@ -81,7 +81,7 @@ function Status() {
                 <p>score: {score}</p>
             </>) : (<>
                 {afterMatch ? (<>
-                    <p>{result}</p>
+                    <h3>{result}</h3>
                     {/* <p>{tie ? 'tie' : 'not tie'}</p>
                     <p>winner: {winner}</p> */}
                     <button onClick={handleRestart}>Restart</button>

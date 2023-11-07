@@ -3,7 +3,7 @@ import socket from "../../socket";
 import Countdown from "../Countdown";
 import "./Piano.css";
 
-function Pianov2() {
+function Pianov3() {
   const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
   const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
   const [notelistReceived, setNotelistReceived] = useState<
@@ -31,10 +31,11 @@ function Pianov2() {
       setNotelistReceived(data.notelist);
     });
 
-    socket.on('start_create', (data) => {
+    socket.on('start_create_server', (data) => {
       setNotelist([]);
       setNotelistReceived([]);
       setIsCreating(true);
+      socket.emit('start_create_client')
     });
 
     socket.on('end_create', () => {
@@ -104,4 +105,4 @@ function Pianov2() {
   );
 }
 
-export default Pianov2;
+export default Pianov3;

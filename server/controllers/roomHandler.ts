@@ -26,6 +26,7 @@ export function roomHandler(io: Server, socket: Socket): void {
             // update properties
             socket.leave(previousRoomId);
             users[userIndex].roomId = "main";
+            users[userIndex].P1 = false;
             
             // Broadcasting the list of players in the room to all users in the server and the room
             updatePlayerInRoom(io, socket, previousRoomId);

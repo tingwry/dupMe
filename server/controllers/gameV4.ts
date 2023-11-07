@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 import { updatePlayerInRoom } from "./playerController";
 
-export function gameHandler2(io: Server, socket: Socket): void {
+export function gameHandler3(io: Server, socket: Socket): void {
     // Controllers
     const info = () => {
         const userIndex = users.findIndex((user) => user.sid === socket.id);
@@ -98,11 +98,6 @@ export function gameHandler2(io: Server, socket: Socket): void {
 
         socket.emit('turn', { turn: "Waiting for another player to follow the pattern" });
         socket.to(roomId).emit('turn', { turn: "Your turn to follow the pattern" });
-        
-        countdown(7, roomId, () => {
-            endFollow(roomId)
-            // console.log('end follow')
-        })
     }
 
     const startCreate = (roomId: string) => {
@@ -110,10 +105,6 @@ export function gameHandler2(io: Server, socket: Socket): void {
 
         socket.emit('turn', { turn: "Your turn to create a pattern" });
         socket.to(roomId).emit('turn', { turn: "Waiting for another player to create a pattern" });
-
-        countdown(5, roomId, () => {
-            endCreate(roomId)
-        })
     }
 
     const readySetGo = (roomId: string) => {
@@ -121,7 +112,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
         const interval = setInterval(() => {
             if (currentTime === 0) {
                 io.to(roomId).emit('time', { time: "Go" });
-                startCreate(roomId)
+                socket.emit('start_create');
                 clearInterval(interval);
             } else if (currentTime === 1) {
                 io.to(roomId).emit('time', { time: "Set" });
@@ -171,6 +162,16 @@ export function gameHandler2(io: Server, socket: Socket): void {
         } else { // is not P1 = always start the next turn
             // console.log('round 1 turn 1 ended');
             readySetGo(roomId);
+            // readySetGo(roomId, () => {
+            //     startCreate(roomId);
+            //     countdown(5, roomId, () => {
+            //         endCreate(roomId)
+            //         countdown(7, roomId, () => {
+            //             endFollow(roomId)
+            //             // console.log('end follow')
+            //         })
+            //     })
+            // });
         }
     }
 
@@ -240,9 +241,17 @@ export function gameHandler2(io: Server, socket: Socket): void {
         const roomIndex = userInfo.roomIndex;
 
         readySetGo(roomId);
+        // readySetGo(roomId, () => {
+        //     startCreate(roomId);
+        //     countdown(5, roomId, () => {
+        //         endCreate(roomId)
+        //         countdown(7, roomId, () => {
+        //             endFollow(roomId)
+        //             // console.log('end follow')
+        //         })
+        //     })
+        // });
     }
-
-    
 
     // const clientRestart = () => {
     //     // Info
@@ -274,6 +283,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
 
     socket.on('ready', ready);
     socket.on('start_turn_client', startTurn);
+    socket.on('start_create_client', startCreate);
 
     socket.on('end_turn', endTurn);
 

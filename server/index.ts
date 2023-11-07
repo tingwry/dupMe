@@ -35,14 +35,16 @@ import { roomHandler } from "./controllers/roomHandler";
 import { gameHandler } from "./controllers/gameHandler";
 import { serverHandler } from "./controllers/serverHandler";
 import { users } from "./dataStorage";
-// import { gameHandler3 } from "./controllers/gamev3";
+import { gameHandler2 } from "./controllers/gameV2";
+import { gameHandler3 } from "./controllers/gameV3";
 
 
 io.on('connection', (socket) => {  
     console.log(`Boombayah welcome: ${socket.id}`)
     userHandler(io, socket);
     roomHandler(io, socket);
-    gameHandler(io, socket);
+    // gameHandler(io, socket);
+    gameHandler3(io, socket);
     serverHandler(io, socket);
 })
 
