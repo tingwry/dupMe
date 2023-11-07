@@ -69,8 +69,6 @@ export function updatePlayerInRoom(io: Server, socket: Socket, roomId: string): 
         // send opponent's info to me
         socket.emit('opponent', { name: opponentName, avatar: opponentAvatar, score: opponentScore });
     }
-
-    
 }
 
 export function updatePlayerInRoom2(io: Server, socket: Socket, roomId: string): void {

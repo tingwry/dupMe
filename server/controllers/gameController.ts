@@ -55,7 +55,6 @@ export function countdown (io: Server, socket: Socket, duration: number, roomId:
 export function startCreate (io: Server, socket: Socket, sid: string, roomId: string, round: number): void {
     io.to(sid).emit('start_create');
     io.to(roomId).emit('start_turn', { round: round }); // to reset timer
-    console.log(`round ${round}`)
     return;
 }
 
@@ -91,7 +90,6 @@ export function winner (roomId: string) {
             return { tie: true, winner: "none" };
         } else {
             const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
-            console.log("max score:", maxScore);
 
             for (const playerInRoom of playersInRoom) {
                 if (playerInRoom.score === maxScore) {

@@ -33,6 +33,7 @@ export function roomHandler(io: Server, socket: Socket): void {
             updatePlayerInRoom(io, socket, previousRoomId);
             io.emit('users', users);
             io.emit('rooms', rooms);
+            socket.emit('profile', { name: users[userIndex].name, avatar: users[userIndex].avatar })
             console.log(`${socket.id} leave_room ${previousRoomId}`); 
         }
     }
