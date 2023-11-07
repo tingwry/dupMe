@@ -12,6 +12,7 @@ function Opponent() {
             setName(data.name);
             setAvatar(data.avatar);
             setScore(data.score);
+            console.log(data)
         })
     }, [socket])
 

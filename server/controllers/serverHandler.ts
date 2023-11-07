@@ -8,10 +8,10 @@ export function serverHandler(io: Server, socket: Socket): void {
         const playerCount = playerInRoom.length;
     
         if (playerCount === 2) {
-            io.to(playerInRoom[0].sid).emit('me', { name : playerInRoom[0].name, score: playerInRoom[0].score})
-            io.to(playerInRoom[0].sid).emit('opponent', { name : playerInRoom[1].name, score: playerInRoom[1].score})
-            io.to(playerInRoom[1].sid).emit('me', { name : playerInRoom[1].name, score: playerInRoom[1].score})
-            io.to(playerInRoom[1].sid).emit('opponent', { name : playerInRoom[0].name, score: playerInRoom[0].score})
+            io.to(playerInRoom[0].sid).emit('me', { name : playerInRoom[0].name, avatar: playerInRoom[0].avatar, score: playerInRoom[0].score})
+            io.to(playerInRoom[0].sid).emit('opponent', { name : playerInRoom[1].name, avatar: playerInRoom[1].avatar, score: playerInRoom[1].score})
+            io.to(playerInRoom[1].sid).emit('me', { name : playerInRoom[1].name, avatar: playerInRoom[1].avatar, score: playerInRoom[1].score})
+            io.to(playerInRoom[1].sid).emit('opponent', { name : playerInRoom[0].name, avatar: playerInRoom[0].avatar, score: playerInRoom[0].score})
         }
     }
 

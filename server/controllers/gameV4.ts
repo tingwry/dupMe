@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 import { updatePlayerInRoom } from "./playerController";
 
-export function gameHandler3(io: Server, socket: Socket): void {
+export function gameHandler4(io: Server, socket: Socket): void {
     // Controllers
     const info = () => {
         const userIndex = users.findIndex((user) => user.sid === socket.id);
@@ -86,33 +86,12 @@ export function gameHandler3(io: Server, socket: Socket): void {
         }
     }
 
-    const endFollow = (roomId: string) => {
-        socket.to(roomId).emit('end_follow');
-
-        io.to(roomId).emit('turn', { turn: "Turn ended" });
-    }
-
-    const endCreate = (roomId: string) => {
-        socket.emit('end_create');
-        socket.to(roomId).emit('start_follow');
-
-        socket.emit('turn', { turn: "Waiting for another player to follow the pattern" });
-        socket.to(roomId).emit('turn', { turn: "Your turn to follow the pattern" });
-    }
-
-    const startCreate = (roomId: string) => {
-        socket.emit('start_create');
-
-        socket.emit('turn', { turn: "Your turn to create a pattern" });
-        socket.to(roomId).emit('turn', { turn: "Waiting for another player to create a pattern" });
-    }
-
     const readySetGo = (roomId: string) => {
         let currentTime = 3;
         const interval = setInterval(() => {
             if (currentTime === 0) {
                 io.to(roomId).emit('time', { time: "Go" });
-                socket.emit('start_create');
+                socket.emit('start_create_server');
                 clearInterval(interval);
             } else if (currentTime === 1) {
                 io.to(roomId).emit('time', { time: "Set" });
@@ -127,7 +106,7 @@ export function gameHandler3(io: Server, socket: Socket): void {
         }, 1000);
     }
 
-    const endTurn = (data: any) => {
+    const startTurn = () => {
         // Info
         const userInfo = info();
         const sid = socket.id
@@ -135,24 +114,68 @@ export function gameHandler3(io: Server, socket: Socket): void {
         const roomId = userInfo.roomId;
         const roomIndex = userInfo.roomIndex;
 
-        // // score
-        // console.log(data)
-        // const arrayR = data.arrayR;
-        // const arrayS = data.arrayS;
-        
-        // // score
-        // const addScore = scoring(arrayR, arrayS);
-        // users[userIndex].score = users[userIndex].score + addScore;
-        // console.log(`${users[userIndex].name} add ${addScore} = ${users[userIndex].score}`);
+        readySetGo(roomId);
+    }
 
-        // io.to(roomId).emit('score', addScore);
-        // updatePlayerInRoom(io, socket, roomId);
+    const startCreate = () => {
+        // Info
+        const userInfo = info();
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        socket.emit('turn', { turn: "Your turn to create a pattern" });
+        socket.to(roomId).emit('turn', { turn: "Waiting for another player to create a pattern" });
+
+        countdown(5, roomId, () => {
+            socket.emit('end_create_server');
+        })
+    }
+
+    const endCreate = () => {
+        // Info
+        const userInfo = info();
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        socket.to(roomId).emit('start_follow_server');
+    }
+
+    const startFollow = () => {
+        // Info
+        const userInfo = info();
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        socket.emit('turn', { turn: "Waiting for another player to follow the pattern" });
+        socket.to(roomId).emit('turn', { turn: "Your turn to follow the pattern" });
+
+        countdown(7, roomId, () => {
+            socket.emit('end_follow_server');
+        })
+    }
+
+    const endFollow = () => {
+        // Info
+        const userInfo = info();
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        io.to(roomId).emit('turn', { turn: "Turn ended" });
 
         // check ending
         if (users[userIndex].P1) { // If is P1
             if (rooms[roomIndex].round > 1) { // Round 2 = end game
                 // rooms[roomIndex].round = 0;
                 console.log('game ended')
+                return;
                 // winner(roomId);
             } else { // Round 1 = continues
                 rooms[roomIndex].round++;
@@ -160,18 +183,8 @@ export function gameHandler3(io: Server, socket: Socket): void {
                 // readySetGo(roomId);
             }
         } else { // is not P1 = always start the next turn
-            // console.log('round 1 turn 1 ended');
+            console.log('round 1 turn 1 ended');
             readySetGo(roomId);
-            // readySetGo(roomId, () => {
-            //     startCreate(roomId);
-            //     countdown(5, roomId, () => {
-            //         endCreate(roomId)
-            //         countdown(7, roomId, () => {
-            //             endFollow(roomId)
-            //             // console.log('end follow')
-            //         })
-            //     })
-            // });
         }
     }
 
@@ -220,6 +233,7 @@ export function gameHandler3(io: Server, socket: Socket): void {
                 } else {
                     p1sid = firstPlayer.sid;
                     p1name = firstPlayer.name;
+
                 }
 
                 rooms[roomIndex].round = 1;
@@ -232,60 +246,14 @@ export function gameHandler3(io: Server, socket: Socket): void {
         }
     }
 
-    const startTurn = () => {
-        // Info
-        const userInfo = info();
-        const sid = socket.id
-        const userIndex = userInfo.userIndex;
-        const roomId = userInfo.roomId;
-        const roomIndex = userInfo.roomIndex;
-
-        readySetGo(roomId);
-        // readySetGo(roomId, () => {
-        //     startCreate(roomId);
-        //     countdown(5, roomId, () => {
-        //         endCreate(roomId)
-        //         countdown(7, roomId, () => {
-        //             endFollow(roomId)
-        //             // console.log('end follow')
-        //         })
-        //     })
-        // });
-    }
-
-    // const clientRestart = () => {
-    //     // Info
-    //     const userInfo = info();
-    //     const sid = socket.id
-    //     const userIndex = userInfo.userIndex;
-    //     const roomId = userInfo.roomId;
-    //     const roomIndex = userInfo.roomIndex;
-        
-    //     const playersInRoom = users.filter((user) => user.roomId === roomId);
-
-    //     playersInRoom.forEach((playerInRoom) => {
-    //         playerInRoom.score = 0;
-    //         playerInRoom.ready = false;
-    //     });
-
-    //     rooms[roomIndex].round = 0;
-
-    //     io.to(roomId).emit('score', 0);
-    //     updatePlayerInRoom(io, socket, roomId);
-
-    //     io.to(roomId).emit('restart', { round: 0 });
-    //     io.to(roomId).emit('ready_state', false);
-
-    //     console.log(`client restart ${roomId}`)
-    // }
-
     socket.on('send_notelist', sendNoteList);
 
     socket.on('ready', ready);
     socket.on('start_turn_client', startTurn);
-    socket.on('start_create_client', startCreate);
-
-    socket.on('end_turn', endTurn);
+    socket.on('start_create_client', endCreate);
+    socket.on('end_create_client', startCreate);
+    socket.on('start_follow_client', startFollow);
+    socket.on('end_follow_client', endFollow);
 
     // socket.on('client-restart', clientRestart);
     

@@ -30,8 +30,32 @@ function Countdown({ duration, running, onTimeout }: Props) {
         
     }, [running, countdown])
 
+    // useEffect(() => {
+    //     if (running) {
+    //         if (countdown === 0) {
+                
+    //         }
+    //         const interval = setInterval(() => {
+    //             setCountdown((prevCount) => {
+    //                 if (prevCount <= 0) {
+    //                     onTimeout();
+    //                     clearInterval(interval);
+    //                     return 0;
+    //                 };
+    //                 return prevCount - 1;
+    //             });
+    //         }, 1000);
+    //         return () => {
+    //             clearInterval(interval);
+    //         };
+    //     }
+        
+    // }, [running, countdown])
+
     return (
-        <>{countdown}</>
+        <>
+            {countdown}
+        </>
     )
 }
 

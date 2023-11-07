@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
-import { updatePlayerInRoom } from "./playerController";
+import { updatePlayerInRoom, updatePlayerInRoom2 } from "./playerController";
 
 export function userHandler(io: Server, socket: Socket): void {
     const submitName = (data: any) => {
@@ -37,6 +37,7 @@ export function userHandler(io: Server, socket: Socket): void {
         } else {
             console.log("disconnect: User not found");
         }
+
         console.log(`User disconnected: ${socket.id}`);
         console.log(`connected users: ${users.length}`);
     }

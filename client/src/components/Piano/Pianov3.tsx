@@ -35,21 +35,23 @@ function Pianov3() {
       setNotelist([]);
       setNotelistReceived([]);
       setIsCreating(true);
-      socket.emit('start_create_client')
+      socket.emit('start_create_client');
     });
 
-    socket.on('end_create', () => {
+    socket.on('end_create_server', () => {
         setIsCreating(false);
+        socket.emit('end_create_client');
     })
 
-    socket.on('start_follow', () => {
+    socket.on('start_follow_server', () => {
       setNotelist([]);
       setIsFollowing(true); // also hide the received note
+      socket.emit('start_follow_client');
     });
 
-    socket.on('end_follow', () => {
+    socket.on('end_follow_server', () => {
         console.log({ arrayR: notelistReceived, arrayS: notelist })
-        socket.emit('end_turn', { arrayR: notelistReceived, arrayS: notelist });
+        socket.emit('end_follow_client', { arrayR: notelistReceived, arrayS: notelist });
         setNotelist([]);
         setNotelistReceived([]);
         setIsFollowing(false);

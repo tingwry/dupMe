@@ -75,6 +75,8 @@ function Piano() {
 
   return (
     <>
+    <div style={{display:"none"}}>
+    {/* <div> */}
       <div className="countdown">
         Create a pattern:
         <Countdown
@@ -94,6 +96,8 @@ function Piano() {
           onTimeout={endFollow}
         />
       </div>
+    </div>
+      
       <div className="display">
         <h3>Display</h3>
         {notelist.map((item) => (

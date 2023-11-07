@@ -9,7 +9,6 @@ const app = express();
 app.use(cors());
 
 app.get('/', (req, res) => {
-    
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
@@ -37,14 +36,14 @@ import { serverHandler } from "./controllers/serverHandler";
 import { users } from "./dataStorage";
 import { gameHandler2 } from "./controllers/gameV2";
 import { gameHandler3 } from "./controllers/gameV3";
+import { gameHandler4 } from "./controllers/gameV4";
 
 
 io.on('connection', (socket) => {  
-    console.log(`Boombayah welcome: ${socket.id}`)
+    console.log(`Boombayah welcome: ${socket.id}`);
     userHandler(io, socket);
     roomHandler(io, socket);
-    // gameHandler(io, socket);
-    gameHandler3(io, socket);
+    gameHandler2(io, socket);
     serverHandler(io, socket);
 })
 

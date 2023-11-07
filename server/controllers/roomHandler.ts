@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
-import { updatePlayerInRoom } from "./playerController";
+import { updatePlayerInRoom, updatePlayerInRoom2 } from "./playerController";
 
 export function roomHandler(io: Server, socket: Socket): void {
     const joinRoom = (roomId: string) => {
