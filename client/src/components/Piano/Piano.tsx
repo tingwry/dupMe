@@ -22,12 +22,24 @@ function Piano() {
       const newNote = { id: notelist.length, note: item };
       const updatedNotelist = [...notelist, newNote]; //Add in array
       setNotelist(updatedNotelist);
-      socket.emit("send_notelist", { notelist: updatedNotelist });
+      // socket.emit("send_notelist", { notelist: updatedNotelist });
 
       const audio = new Audio(`sounds/${item}.mp3`);
       audio.play();
     }
   };
+
+  const handleDelete = () => {
+    if (isCreating || isFollowing) {
+      const updatedNotelist = [...notelist]
+      updatedNotelist.pop();
+      setNotelist(updatedNotelist);
+    }
+  }
+
+  useEffect(() => {
+    socket.emit("send_notelist", { notelist: notelist });
+  }, [notelist])
 
   const endCreate = () => {
     socket.emit("end_create");
@@ -119,6 +131,7 @@ function Piano() {
           </>
         )}
       </div>
+      <button onClick={handleDelete}>Delete</button>
 
       <div className="piano-container">
         {allnotes.map((item) => (

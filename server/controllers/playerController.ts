@@ -38,11 +38,8 @@ export function updatePlayerInRoom(io: Server, socket: Socket, roomId: string): 
         }
     }
 
-    console.log(users)
-
     const me = users.find((user) => (user.roomId === roomId) && (user.sid === socket.id));
     const opponent = users.find((user) => (user.roomId === roomId) && (user.sid !== socket.id));
-    console.log(me);
     let myName = "";
     let myAvatar = "";
     let myScore = 0;

@@ -13,8 +13,9 @@ export function roomHandler(io: Server, socket: Socket): void {
             
             // Broadcasting the list of players in the room to all users in the server and the room
             updatePlayerInRoom(io, socket, roomId);
+            socket.emit('in_room', roomId);
             io.emit('users', users);
-            io.emit('rooms', rooms)
+            io.emit('rooms', rooms);
         } 
     }
 

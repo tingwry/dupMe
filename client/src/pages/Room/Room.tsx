@@ -10,10 +10,17 @@ import Pianov2 from "../../components/Piano/Pianov2";
 import Statusv2 from "../../components/Status/Statusv2";
 import Pianov3 from "../../components/Piano/Pianov3";
 import Statusv3 from "../../components/Status/Statusv3";
+import { useEffect, useState } from "react";
 
 function Room() {
+    const [room, setRoom] = useState("main")
+    useEffect(() => {
+        socket.on('in_room', (data) => {
+            setRoom(data)
+        })
+    }, [socket])
     return (<>
-        <h2>Room</h2>
+        <h2>{room}</h2>
         <div className='player-container'>
             <div className='me'>
                 <Me />

@@ -28,7 +28,6 @@ export function gameHandler2(io: Server, socket: Socket): void {
         const roomIndex = userInfo.roomIndex;
 
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
-            console.log('wottt')
             // Set ready to true
             users[userIndex].ready = true;
             io.to(sid).emit('ready_state', true);
@@ -39,7 +38,6 @@ export function gameHandler2(io: Server, socket: Socket): void {
                 const bothPlayersReady = playersInRoom.every((player) => player.ready);
 
                 if (bothPlayersReady) {
-                    let firstPlayerSocketId = playersInRoom.find((player) => player.P1)?.sid
                     let firstPlayer = playersInRoom.find((player) => player.P1);
                     let p1sid = "";
                     let p1name = "";
@@ -59,11 +57,9 @@ export function gameHandler2(io: Server, socket: Socket): void {
                     }
 
                     rooms[roomIndex].round = 1;
-                    const round = rooms[roomIndex].round;
 
                     io.to(roomId).emit('turn', { message: `${p1name} is the first player`});
                     io.to(p1sid).emit('start_game_server');
-                    // startCreate(p1sid, roomId, round);
                 } else {
                     socket.emit('turn', { message: "Waiting for another player" });
                     console.log('waiting for another player')
@@ -123,7 +119,6 @@ export function gameHandler2(io: Server, socket: Socket): void {
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
             const name = users[userIndex].name;
 
-            // const playersInRoom = users.filter((user) => user.roomId === roomId);
             const arrayR = data.arrayR;
             const arrayS = data.arrayS;
             
