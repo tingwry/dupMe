@@ -7,6 +7,8 @@ function Status() {
     const [isReady, setIsReady] = useState(false); // data from the server
     const [playing, setPlaying] = useState(false);
     const [afterMatch, setIsAfterMatch] = useState(false);
+
+    const [mode, setMode] = useState("easy");
     
     const [time, setTime] = useState<any>();
     const [message, setMessage] = useState<string>();
@@ -32,18 +34,33 @@ function Status() {
         socket.emit("surrender");
     };
 
-    const handleModeEasy = () => {
-        socket.emit('set_mode', "easy");
-    }
+    // const handleModeEasy = () => {
+    //     socket.emit('set_mode', "easy");
+    // }
 
-    const handleModeHard = () => {
-        socket.emit('set_mode', "hard");
+    // const handleModeHard = () => {
+    //     socket.emit('set_mode', "hard");
+    // }
+
+    const handleMode = (mode: string) => {
+        console.log(mode)
+        if (mode === "easy") {
+            setMode("hard");
+            socket.emit('set_mode', "hard");
+        } else if (mode === "hard") {
+            setMode("easy");
+            socket.emit('set_mode', "easy");
+        }
     }
 
     useEffect(() => {
         // socket.on('ready_state', (data) => {
         //     setIsReady(data);
         // });
+
+        socket.on('mode', (data) => {
+            setMode(data.mode)
+        })
 
         socket.on('start_game_server', () => {
             setPlaying(true);
@@ -121,15 +138,17 @@ function Status() {
 //   }, [socket]);
 
   return ( <> 
+        <h3>{message}</h3>
         {playing ? (<>
-            <h3>{message}</h3>
+            {/* <h3>{message}</h3> */}
             <h3>{time}</h3>
+            <button onClick={handleSurrender}>Surrender</button>
         </>) : (<>
             {afterMatch ? (<>
                 <button onClick={handleRestart}>Restart</button>
             </>) : (<>
                 {isReady ? (<>
-                    <h3>{message}</h3>
+                    {/* <h3>{message}</h3> */}
                 </>) : (<>
                     <button onClick={handleLeave}>Leave This Room</button>
                     <button
@@ -138,9 +157,16 @@ function Status() {
                     >
                         Ready
                     </button>
-                    <Link to="/chat">
+                    <p></p>
+                    <button onClick={() => handleMode(mode)}>
+                        {mode}
+                    </button>
+                    {/* <p></p>
+                    <button onClick={handleModeEasy}>Easy</button>
+                    <button onClick={handleModeHard}>Hard</button> */}
+                    {/* <Link to="/chat">
                         <button> Chat Room </button>
-                    </Link>
+                    </Link> */}
                 </>)}
             </>)}
         </>)

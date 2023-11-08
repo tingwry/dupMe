@@ -49,7 +49,11 @@ io.on('connection', (socket) => {
 
 // Run server
 const PORT = 3000;
-const SERVER_IP = "127.0.0.1"; 
-server.listen(PORT, SERVER_IP, () => {
-    console.log(`Boombayah is running at http://${SERVER_IP}:${PORT}`);
+// const SERVER_IP = "127.0.0.1"; 
+// server.listen(PORT, SERVER_IP, () => {
+//     console.log(`Boombayah is running at http://${SERVER_IP}:${PORT}`);
+// })
+
+server.listen(PORT, () => {
+    console.log(`Boombayah is running at http://:${PORT}`);
 })

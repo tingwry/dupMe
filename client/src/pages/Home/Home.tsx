@@ -80,6 +80,7 @@ function Home() {
             <ChatRoomv2 />
         </> ) : ( <>
             <SubmitUser />
+            <p></p>
             <Link to="/how-to-play">
               <button>How to Play</button>
             </Link>

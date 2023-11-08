@@ -7,7 +7,7 @@ function Opponent() {
     const [avatar, setAvatar] = useState<string>();
     const [score, setScore] = useState(0);
 
-    const [oppoentReaction, settOpponenReaction] = useState<string>("Your opponent's will be shown here");
+    const [oppoentReaction, settOpponenReaction] = useState<string>("Your opponent's reaction will be shown here");
 
     useEffect(() => {
         socket.on('opponent', (data) => {

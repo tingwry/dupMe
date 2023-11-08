@@ -229,6 +229,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
         const roomIndex = userInfo.roomIndex;
 
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
+            const loser = users[userIndex].name;
             // find winner
             const playersInRoom = users.filter((user) => user.roomId === roomId);
 
@@ -245,6 +246,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
                 }
             }
 
+            io.to(roomId).emit('turn', { message: `${loser} surrender. The winner is ${winner.name}` } )
             io.to(roomId).emit('winner', winner.name);
             io.to(roomId).emit('end_game', { tie: false, winner: winner.name });
             io.to(roomId).emit('surrender', { round: 0 });
