@@ -110,7 +110,7 @@ function Status() {
 //         setWinner(data.winner);
 //         setResult(`The winner is ${data.winner}`);
 //       }
-//       console.log(data);
+    //   console.log(data);
 //     });
 
 //     socket.on("restart", (data) => {
@@ -119,8 +119,29 @@ function Status() {
 //     });
 //   }, [socket]);
 
-  return (
-    <>
+  return ( <>
+        {playing ? (<>
+
+        </>) : (<>
+            {afterMatch ? (<>
+                <button onClick={handleRestart}>Restart</button>
+            </>) : (<>
+                <button onClick={handleLeave}>leave this room</button>
+                <button
+                    onClick={handleReady}
+                    className={isReady ? "button-clicked" : "button-default"}
+                >
+                    Ready
+                </button>
+                <p>
+                <Link to="/chat">
+                    <button> Chat Room </button>
+                </Link>
+            </p>
+            </>)}
+        </>)
+        }
+        
         {isReady ? (<>
             <h3>{message}</h3>
             <h3>{time}</h3>
@@ -142,8 +163,7 @@ function Status() {
                 </Link>
             </p>
         </>)} 
-    </>
-  );
+    </> );
 }
 
 export default Status;

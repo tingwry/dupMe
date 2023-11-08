@@ -295,9 +295,9 @@ export function gameHandler(io: Server, socket: Socket): void {
         }
 
         io.to(roomId).emit('winner', winner.name);
-        io.to(roomId).emit('end_game', { tie: false, winner: winner.name});
+        io.to(roomId).emit('end_game', { tie: false, winner: winner.name });
         io.to(roomId).emit('surrender', { round: 0 });
-        }
+    }
 
     socket.on('ready', ready);
     socket.on('send_notelist', sendNoteList);
