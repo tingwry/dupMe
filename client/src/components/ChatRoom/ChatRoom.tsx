@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import socket from "../../socket";
 import { Link } from "react-router-dom";
+import "./ChatRoom.css";
 
 interface Message {
   user: string;
@@ -27,14 +28,13 @@ const ChatRoom: React.FC = () => {
       setNewMessage("");
     }
   };
-
   return (
     <>
       <div className="chat-messages">
         {messages.map((message, index) => (
-          <div key={index}>
-            <span>{message.user}: </span>
-            <span>{message.message}</span>
+          <div key={index} className="chat-message">
+            <span className="username">{message.user}: </span>
+            <span className="message-text">{message.message}</span>
           </div>
         ))}
       </div>

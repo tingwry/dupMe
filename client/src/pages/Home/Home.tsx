@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import socket from "../../socket";
 import SelectRoom from "../../components/SelectRoom/SelectRoom";
 import SubmitUser from "../../components/SubmitUser/SubmitUser";
-import HowToPlay from "../../components/HowToPlay";
 
 function Home() {
   const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
@@ -33,6 +32,15 @@ function Home() {
     });
   }, [socket]);
 
+  // change bg color
+  const [color, setColor] = useState("#EEDBB5");
+  const handleClick = (color: string) => {
+    setColor(color);
+  };
+  useEffect(() => {
+    document.body.style.backgroundColor = color;
+  }, [color]);
+
   return (
     <>
       <h1>WELCOME!</h1>
@@ -46,6 +54,35 @@ function Home() {
             </div>
           ))}
           <SelectRoom />
+          <h3>Choose bg color!</h3>
+          <button
+            onClick={() => {
+              handleClick("#EEDBB5");
+            }}
+          >
+            Default
+          </button>
+          <button
+            onClick={() => {
+              handleClick("yellow");
+            }}
+          >
+            Yellow
+          </button>
+          <button
+            onClick={() => {
+              handleClick("blue");
+            }}
+          >
+            Blue
+          </button>
+          <button
+            onClick={() => {
+              handleClick("green");
+            }}
+          >
+            Green
+          </button>
         </>
       ) : (
         <>

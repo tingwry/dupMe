@@ -33,6 +33,10 @@ function Status() {
     socket.emit("client-restart");
   };
 
+  const handleSurrender = () => {
+    socket.emit("surrender");
+  };
+
   useEffect(() => {
     socket.on("ready_state", (data) => {
       setIsReady(data);
@@ -81,6 +85,7 @@ function Status() {
         <>
           {/* <ReadySetGo key={isMyTurn} /> */}
           <p>score: {score}</p>
+          <button onClick={handleSurrender}>surrender</button>
         </>
       ) : (
         <>
