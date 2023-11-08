@@ -19,6 +19,7 @@ const ChatRoom: React.FC = () => {
 
     return () => {
       socket.off("new_message");
+      socket.off("user_joined");
     };
   }, []);
 
@@ -28,8 +29,10 @@ const ChatRoom: React.FC = () => {
       setNewMessage("");
     }
   };
+
   return (
     <>
+      <h2>Chat Room</h2>
       <div className="chat-messages">
         {messages.map((message, index) => (
           <div key={index} className="chat-message">

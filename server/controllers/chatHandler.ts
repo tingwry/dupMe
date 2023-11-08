@@ -6,6 +6,7 @@ export function chatHandler(io: Server, socket: Socket): void {
     socket.join(data);
   });
 
+
   socket.on("send_message", (data) => {
     const userIndex = users.findIndex((user) => user.sid === socket.id);
     if (userIndex !== -1) {
