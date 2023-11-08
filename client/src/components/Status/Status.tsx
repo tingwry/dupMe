@@ -8,7 +8,7 @@ function Status() {
     const [playing, setPlaying] = useState(false);
     const [afterMatch, setIsAfterMatch] = useState(false);
 
-    const [mode, setMode] = useState("easy");
+    const [mode, setMode] = useState("Easy");
     
     const [time, setTime] = useState<any>();
     const [message, setMessage] = useState<string>();
@@ -34,46 +34,38 @@ function Status() {
         socket.emit("surrender");
     };
 
-    // const handleModeEasy = () => {
-    //     socket.emit('set_mode', "easy");
-    // }
-
-    // const handleModeHard = () => {
-    //     socket.emit('set_mode', "hard");
-    // }
-
     const handleMode = (mode: string) => {
         console.log(mode)
-        if (mode === "easy") {
-            setMode("hard");
-            socket.emit('set_mode', "hard");
-        } else if (mode === "hard") {
-            setMode("easy");
-            socket.emit('set_mode', "easy");
+        if (mode === "Easy") {
+            setMode("Hard");
+            socket.emit('set_mode', "Hard");
+        } else if (mode === "Hard") {
+            setMode("Easy");
+            socket.emit('set_mode', "Easy");
         }
     }
 
     useEffect(() => {
-        // socket.on('ready_state', (data) => {
-        //     setIsReady(data);
-        // });
-
         socket.on('mode', (data) => {
             setMode(data.mode)
-        })
+        });
+
+        socket.on('turn', (data) => {
+            setMessage(data.message)
+        });
+
+        socket.on('time', (data) => {
+            setTime(data.time)
+        });
 
         socket.on('start_game_server', () => {
             setPlaying(true);
             socket.emit('start_game_client');
-        })
+        });
 
-        socket.on('turn', (data) => {
-            setMessage(data.message)
-        })
-
-        socket.on('time', (data) => {
-            setTime(data.time)
-        })
+        socket.on('start_game', () => {
+            setPlaying(true);
+        });
 
         socket.on('end_game', (data) => {
             // combine tie and winner
@@ -85,14 +77,15 @@ function Status() {
                 setResult(`The winner is ${data.winner}`)
             }
             console.log(data)
-        })
+        });
 
         socket.on('restart', (data) => {
             setIsReady(false);
             setPlaying(false);
             setIsAfterMatch(false);
             setMessage("");
-        })
+        });
+
     }, [socket]);
 
 //   useEffect(() => {
@@ -161,12 +154,6 @@ function Status() {
                     <button onClick={() => handleMode(mode)}>
                         {mode}
                     </button>
-                    {/* <p></p>
-                    <button onClick={handleModeEasy}>Easy</button>
-                    <button onClick={handleModeHard}>Hard</button> */}
-                    {/* <Link to="/chat">
-                        <button> Chat Room </button>
-                    </Link> */}
                 </>)}
             </>)}
         </>)

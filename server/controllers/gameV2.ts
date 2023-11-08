@@ -14,12 +14,12 @@ export function gameHandler2(io: Server, socket: Socket): void {
         const roomIndex = userInfo.roomIndex;
 
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
-            if (mode === "easy") {
-                rooms[roomIndex].mode = "easy";
-                io.to(roomId).emit('mode', { mode: "easy", createDuration: 10, followDuration: 20, round: 10 });
-            } else if (mode === "hard") {
-                rooms[roomIndex].mode = "hard";
-                io.to(roomId).emit('mode', { mode: "hard", createDuration: 5, followDuration: 7, round: 5 });
+            if (mode === "Easy") {
+                rooms[roomIndex].mode = "Easy";
+                io.to(roomId).emit('mode', { mode: "Easy", createDuration: 10, followDuration: 20, round: 10 });
+            } else if (mode === "Hard") {
+                rooms[roomIndex].mode = "Hard";
+                io.to(roomId).emit('mode', { mode: "Hard", createDuration: 5, followDuration: 7, round: 5 });
             }
         }
         return;
@@ -50,7 +50,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
             // Set ready to true
             users[userIndex].ready = true;
-            io.to(sid).emit('ready_state', true);
+            // io.to(sid).emit('ready_state', true);
 
             // Check both players
             const playersInRoom = users.filter((user) => user.roomId === roomId);
@@ -79,6 +79,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
                     rooms[roomIndex].round = 1;
 
                     io.to(roomId).emit('turn', { message: `${p1name} is the first player`});
+                    io.to(roomId).emit('start_game');
                     io.to(p1sid).emit('start_game_server');
                 } else {
                     socket.emit('turn', { message: "Waiting for another player" });

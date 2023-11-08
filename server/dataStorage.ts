@@ -14,9 +14,9 @@ export let rooms: {
     round: number, 
     players: number
 }[] = [
-    {roomId: "room 1", mode: "easy", round: 1, players: 0},
-    {roomId: "room 2", mode: "easy", round: 1, players: 0},
-    {roomId: "room 3", mode: "easy", round: 1, players: 0},
+    {roomId: "room 1", mode: "Easy", round: 1, players: 0},
+    {roomId: "room 2", mode: "Easy", round: 1, players: 0},
+    {roomId: "room 3", mode: "Easy", round: 1, players: 0},
 ];
 
 export let serverSocket: string = "";
