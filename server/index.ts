@@ -35,6 +35,7 @@ import { roomHandler } from "./controllers/roomHandler";
 import { gameHandler } from "./controllers/gameHandler";
 import { serverHandler } from "./controllers/serverHandler";
 import { users } from "./dataStorage";
+import { chatHandler } from "./controllers/chatHandler";
 // import { gameHandler3 } from "./controllers/gamev3";
 
 
@@ -47,6 +48,7 @@ io.on('connection', (socket) => {
     // }
     gameHandler(io, socket);
     serverHandler(io, socket);
+    chatHandler(io, socket);
 })
 
 // Run server
