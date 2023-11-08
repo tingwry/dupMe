@@ -74,6 +74,7 @@ function Status() {
             setIsReady(false);
             setPlaying(false);
             setIsAfterMatch(false);
+            setMessage("");
         })
     }, [socket]);
 
@@ -119,30 +120,33 @@ function Status() {
 //     });
 //   }, [socket]);
 
-  return ( <>
+  return ( <> 
         {playing ? (<>
-
+            <h3>{message}</h3>
+            <h3>{time}</h3>
         </>) : (<>
             {afterMatch ? (<>
                 <button onClick={handleRestart}>Restart</button>
             </>) : (<>
-                <button onClick={handleLeave}>leave this room</button>
-                <button
-                    onClick={handleReady}
-                    className={isReady ? "button-clicked" : "button-default"}
-                >
-                    Ready
-                </button>
-                <p>
-                <Link to="/chat">
-                    <button> Chat Room </button>
-                </Link>
-            </p>
+                {isReady ? (<>
+                    <h3>{message}</h3>
+                </>) : (<>
+                    <button onClick={handleLeave}>Leave This Room</button>
+                    <button
+                        onClick={handleReady}
+                        className={isReady ? "button-clicked" : "button-default"}
+                    >
+                        Ready
+                    </button>
+                    <Link to="/chat">
+                        <button> Chat Room </button>
+                    </Link>
+                </>)}
             </>)}
         </>)
         }
         
-        {isReady ? (<>
+        {/* {isReady ? (<>
             <h3>{message}</h3>
             <h3>{time}</h3>
             <button onClick={handleSurrender}>surrender</button>
@@ -162,7 +166,7 @@ function Status() {
                     <button> Chat Room </button>
                 </Link>
             </p>
-        </>)} 
+        </>)}  */}
     </> );
 }
 

@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import socket from "../../socket";
 import SelectRoom from "../../components/SelectRoom/SelectRoom";
 import SubmitUser from "../../components/SubmitUser/SubmitUser";
+import ChatRoom from "../../components/ChatRoom/ChatRoom";
+import ChatRoomv2 from "../../components/ChatRoom/ChatRoomv2";
 
 function Home() {
   const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
@@ -52,12 +54,12 @@ function Home() {
                 alt="Profile"
             />
             <div className='name'>{name}</div>
-            <p>current players: {users.length}</p>
+            {/* <p>current players: {users.length}</p>
             {users.map((item) => (
                 <div key={item.sid}>
                     {item.name}, {item.roomId}
                 </div>
-            ))}
+            ))} */}
             <SelectRoom />
 
             <div>
@@ -75,6 +77,7 @@ function Home() {
                     Green
                 </button>
             </div>
+            <ChatRoomv2 />
         </> ) : ( <>
             <SubmitUser />
             <Link to="/how-to-play">
