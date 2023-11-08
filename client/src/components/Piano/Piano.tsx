@@ -11,9 +11,9 @@ function Piano() {
   >([]);
   const [round, setRound] = useState(0);
 
-  const [createDuration, setCreateDuration] = useState(5);
+  const [createDuration, setCreateDuration] = useState(10);
   const [isCreating, setIsCreating] = useState(false);
-  const [followDuration, setFollowDuration] = useState(7);
+  const [followDuration, setFollowDuration] = useState(20);
   const [isFollowing, setIsFollowing] = useState(false);
 
   // Click note
