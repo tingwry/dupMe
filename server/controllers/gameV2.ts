@@ -1,9 +1,29 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 import { playerInfo, updatePlayerInRoom,  updatePlayerInRoom2} from "./playerController";
-import { countdown, readySetGo, scoring, startCreate, winner } from "./gameController";
+import { countdown, findMode, readySetGo, scoring, startCreate, winner } from "./gameController";
 
 export function gameHandler2(io: Server, socket: Socket): void {
+
+    const setMode = (mode: string) => {
+        // Info
+        const userInfo = playerInfo(io, socket);
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
+            if (mode === "easy") {
+                rooms[roomIndex].mode = "easy";
+                io.to(roomId).emit('mode', { mode: "easy", createDuration: 10, followDuration: 20, round: 10 });
+            } else if (mode === "hard") {
+                rooms[roomIndex].mode = "hard";
+                io.to(roomId).emit('mode', { mode: "hard", createDuration: 5, followDuration: 7, round: 5 });
+            }
+        }
+        return;
+    }
 
     const sendNoteList = (data: any) => {
         // Info
@@ -81,10 +101,14 @@ export function gameHandler2(io: Server, socket: Socket): void {
         const roomIndex = userInfo.roomIndex;
 
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
-            const round = rooms[roomIndex].round;;
+            const round = rooms[roomIndex].round;
+            const time = findMode(roomIndex);
+            const createDuration = time.createDuration;
+            const followDuration = time.followDuration;
+
             readySetGo(io, socket, roomId, () => {
                 startCreate(io, socket, sid, roomId, round);
-                countdown(io, socket, 5,roomId)
+                countdown(io, socket, createDuration, roomId)
             })
         }
         return;
@@ -103,7 +127,10 @@ export function gameHandler2(io: Server, socket: Socket): void {
             socket.emit('turn', { message: "Waiting for another player to follow the pattern" });
             socket.to(roomId).emit('turn', { message: "Your turn to follow the pattern"});
 
-            countdown(io, socket, 7, roomId);
+            const time = findMode(roomIndex);
+            const createDuration = time.createDuration;
+            const followDuration = time.followDuration;
+            countdown(io, socket, followDuration, roomId);
         }
         return;
     }
@@ -130,6 +157,11 @@ export function gameHandler2(io: Server, socket: Socket): void {
             io.to(roomId).emit('turn', { message: `${name} get ${addScore} score` });
             updatePlayerInRoom(io, socket, roomId);
 
+            // time
+            const time = findMode(roomIndex);
+            const createDuration = time.createDuration;
+            const followDuration = time.followDuration;
+
             // check ending
             if (users[userIndex].P1) { // If is P1
                 if (rooms[roomIndex].round >= 2) { // Round 2 = end game
@@ -146,14 +178,14 @@ export function gameHandler2(io: Server, socket: Socket): void {
                     const round = rooms[roomIndex].round;
                     readySetGo(io, socket, roomId, () => {
                         startCreate(io, socket, sid, roomId, round);
-                        countdown(io, socket, 5,roomId)
+                        countdown(io, socket, createDuration,roomId)
                     })
                 }
             } else { // is not P1 = always start the next turn
                 const round = rooms[roomIndex].round;
                 readySetGo(io, socket, roomId, () => {
                     startCreate(io, socket, sid, roomId, round);
-                    countdown(io, socket, 5,roomId)
+                    countdown(io, socket, createDuration,roomId)
                 })
             }
         }
@@ -188,6 +220,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
         return;
     }
 
+    socket.on('set_mode', setMode)
     socket.on('send_notelist', sendNoteList);
     socket.on('ready', ready);
     socket.on('start_game_client', startGame);

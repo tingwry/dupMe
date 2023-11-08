@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
-import { updatePlayerInRoom, updatePlayerInRoom2 } from "./playerController";
+import { playerInfo, updatePlayerInRoom, updatePlayerInRoom2 } from "./playerController";
 
 export function roomHandler(io: Server, socket: Socket): void {
     const joinRoom = (roomId: string) => {
@@ -38,6 +38,20 @@ export function roomHandler(io: Server, socket: Socket): void {
         }
     }
 
+    const reaction = (data: any) => {
+        const userInfo = playerInfo(io, socket);
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
+            socket.to(roomId).emit('receive_reaction', data);
+            return;
+        }
+    }
+
     socket.on('join_room', joinRoom);
-    socket.on('leave_room', leaveRoom)
+    socket.on('leave_room', leaveRoom);
+    socket.on('send_reaction', reaction)
 }

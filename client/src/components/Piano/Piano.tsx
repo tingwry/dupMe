@@ -54,6 +54,12 @@ function Piano() {
   };
 
   useEffect(() => {
+    socket.on('mode', (data) => {
+      setCreateDuration(data.createDuration);
+      setFollowDuration(data.followDuration);
+      setRound(data.round);
+    })
+
     socket.on("start_create", (data) => {
       setNotelist([]);
       setNotelistReceived([]);
@@ -87,8 +93,8 @@ function Piano() {
 
   return (
     <>
-    <div style={{display:"none"}}>
-    {/* <div> */}
+    {/* <div style={{display:"none"}}> */}
+    <div>
       <div className="countdown">
         Create a pattern:
         <Countdown
@@ -137,9 +143,7 @@ function Piano() {
         {allnotes.map((item) => (
           <div
             key={item}
-            onClick={() => {
-              handleClickNote(item);
-            }}
+            onClick={() => {handleClickNote(item)}}
           >
             {item}
           </div>

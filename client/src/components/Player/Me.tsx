@@ -6,12 +6,18 @@ function Me() {
     const [name, setName] = useState<string>();
     const [avatar, setAvatar] = useState<string>();
     const [score, setScore] = useState(0);
+    const [myReaction, settMyReaction] = useState<string>("Your reaction will be shown here");
+    const allReaction = ["yay", "sad", "bye", "hi"];
+
+    const handleReaction = (item: string) => {
+        socket.emit('send_reaction', { reaction: item });
+        settMyReaction(item);
+    }
 
     useEffect(() => {
         socket.on('me', (data) => {
             setName(data.name);
             setAvatar(data.avatar);
-            console.log(data.avatar)
             setScore(data.score);
         })
     }, [socket])
@@ -26,6 +32,17 @@ function Me() {
         />
         <div className='name'>{name}</div>
         <div>current score: {score}</div>
+
+        <h3>Your reaction</h3>
+        {allReaction.map((item) => (
+            <button 
+                key={item} 
+                onClick={() => {handleReaction(item)}}
+            >
+                {item}
+            </button>
+        ))}
+        <p>{myReaction}</p>
     </>)
 }
 

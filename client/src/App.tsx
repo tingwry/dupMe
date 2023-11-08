@@ -12,28 +12,28 @@ function App() {
 
     useEffect(() => {
         if (!isConnected) {
-          navigate('/');
+            navigate('/');
         }
     }, [isConnected, navigate]);
 
     useEffect(() => {
-      socket.on('connect', () => {
-        setIsConnected(true);
-      });
-  
-      socket.on('disconnect', () => {
-        setIsConnected(false);
-      });
-  }, [socket]);
+        socket.on('connect', () => {
+            setIsConnected(true);
+        });
+    
+        socket.on('disconnect', () => {
+            setIsConnected(false);
+        });
+    }, [socket]);
 
     return (
-      <div className="App">
-        <div className="tab">DupMe</div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/room" element={<Room />} />
-        </Routes>
-      </div>
+        <div className="App">
+            <div className="tab">DupMe</div>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/room" element={<Room />} />
+            </Routes>
+        </div>
     );
 }
 

@@ -15,7 +15,7 @@ function Status() {
     const navigate = useNavigate();
     const handleLeave = () => {
         socket.emit('leave_room');
-        navigate('/')
+        navigate('/');
     };
 
     const handleReady = () => {
@@ -25,6 +25,14 @@ function Status() {
 
     const handleRestart = () => {
         socket.emit('client-restart')
+    }
+
+    const handleModeEasy = () => {
+        socket.emit('set_mode', "easy");
+    }
+
+    const handleModeHard = () => {
+        socket.emit('set_mode', "hard");
     }
 
     useEffect(() => {
@@ -76,7 +84,9 @@ function Status() {
                     className={isReady ? "button-clicked" : "button-default"}
                 >
                     Ready
-                </button> 
+                </button>
+                <button onClick={handleModeEasy}>Easy</button>
+                <button onClick={handleModeHard}>Hard</button>
             </>)}
             
 
