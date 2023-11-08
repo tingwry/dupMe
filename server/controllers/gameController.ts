@@ -5,12 +5,12 @@ export function findMode (roomIndex: number) {
     const mode = rooms[roomIndex].mode;
     let createDuration = 10;
     let followDuration = 20;
-    if (mode === "easy") {
-    } else if (mode === "hard") {
+    if (mode === "Easy") {
+    } else if (mode === "Hard") {
         createDuration = 5;
         followDuration = 7;
     }
-    return { createDuration: createDuration, followDuration: followDuration }
+    return { mode: mode, createDuration: createDuration, followDuration: followDuration }
 }
 
 export function readySetGo (io: Server, socket: Socket, roomId: string, onTimeout: () => void): void {

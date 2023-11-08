@@ -6,7 +6,7 @@
 #root {
   box-sizing: border-box;
   width: 100%;
-  height: auto;
+  /* overflow-y: auto; */
   margin: 2rem;
   text-align: center;
   color: var(--black);
@@ -23,14 +23,18 @@
   align-content: center; */
 }
 
-h1, h2, h3, button {
-  font-family: 'Press Start 2P', 'Prompt',sans-serif;
+h1, h2, h3 {
+  font-family: 'Press Start 2P', 'Prompt', sans-serif;
+  line-height: 1.5em;
+  /* background-color:aqua; */
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 input {
   width: auto;
   height: 30px;
-  border: 1px solid white;
+  border: 2px solid white;
   border-radius: 6px;
   outline: 0;
   background-color: white;
@@ -50,4 +54,5 @@ input:focus {
   color: var(--white);
   font-family: 'Press Start 2P', 'Prompt',sans-serif;
   line-height: 1.5em;
+  position: static;
 }

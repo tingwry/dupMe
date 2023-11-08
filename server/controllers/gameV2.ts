@@ -1,10 +1,9 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
-import { playerInfo, updatePlayerInRoom,  updatePlayerInRoom2} from "./playerController";
+import { playerInfo, updatePlayerInRoom } from "./playerController";
 import { countdown, findMode, readySetGo, scoring, startCreate, winner } from "./gameController";
 
 export function gameHandler2(io: Server, socket: Socket): void {
-
     const setMode = (mode: string) => {
         // Info
         const userInfo = playerInfo(io, socket);
@@ -103,9 +102,9 @@ export function gameHandler2(io: Server, socket: Socket): void {
 
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
             const round = rooms[roomIndex].round;
-            const time = findMode(roomIndex);
-            const createDuration = time.createDuration;
-            const followDuration = time.followDuration;
+            const mode = findMode(roomIndex);
+            const createDuration = mode.createDuration;
+            const followDuration = mode.followDuration;
 
             readySetGo(io, socket, roomId, () => {
                 startCreate(io, socket, sid, roomId, round);
@@ -128,9 +127,9 @@ export function gameHandler2(io: Server, socket: Socket): void {
             socket.emit('turn', { message: "Waiting for another player to follow the pattern" });
             socket.to(roomId).emit('turn', { message: "Your turn to follow the pattern"});
 
-            const time = findMode(roomIndex);
-            const createDuration = time.createDuration;
-            const followDuration = time.followDuration;
+            const mode = findMode(roomIndex);
+            const createDuration = mode.createDuration;
+            const followDuration = mode.followDuration;
             countdown(io, socket, followDuration, roomId);
         }
         return;
@@ -159,9 +158,9 @@ export function gameHandler2(io: Server, socket: Socket): void {
             updatePlayerInRoom(io, socket, roomId);
 
             // time
-            const time = findMode(roomIndex);
-            const createDuration = time.createDuration;
-            const followDuration = time.followDuration;
+            const mode = findMode(roomIndex);
+            const createDuration = mode.createDuration;
+            const followDuration = mode.followDuration;
 
             // check ending
             if (users[userIndex].P1) { // If is P1

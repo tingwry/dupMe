@@ -35,7 +35,6 @@ function Status() {
     };
 
     const handleMode = (mode: string) => {
-        console.log(mode)
         if (mode === "Easy") {
             setMode("Hard");
             socket.emit('set_mode', "Hard");
@@ -140,6 +139,7 @@ function Status() {
             {afterMatch ? (<>
                 <button onClick={handleRestart}>Restart</button>
             </>) : (<>
+                
                 {isReady ? (<>
                     {/* <h3>{message}</h3> */}
                 </>) : (<>

@@ -1,110 +1,127 @@
 import React, { useEffect, useState } from 'react'
 import socket from '../../socket';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from "react-router-dom";
 import './Status.css'
 
 function Statusv2() {
     const [isReady, setIsReady] = useState(false); // data from the server
-    // const [score, setScore] = useState(0);
+    const [playing, setPlaying] = useState(false);
+    const [afterMatch, setIsAfterMatch] = useState(false);
 
-    // const [playing, setPlaying] = useState(false);
-    // const [afterMatch, setIsAfterMatch] = useState(false);
-    const [turn, setTurn] = useState("");
+    const [mode, setMode] = useState("Easy");
+    
     const [time, setTime] = useState<any>();
+    const [message, setMessage] = useState<string>();
+    const [result, setResult] = useState<string>();
     
     const navigate = useNavigate();
+
     const handleLeave = () => {
         socket.emit('leave_room');
-        navigate('/')
+        navigate('/');
     };
 
     const handleReady = () => {
         socket.emit('ready');
-        console.log('ready')
+        setIsReady(true);
     };
 
     const handleRestart = () => {
-        socket.emit('client-restart')
+        socket.emit("client-restart");
+      };
+    
+    const handleSurrender = () => {
+        socket.emit("surrender");
+    };
+
+    const handleMode = (mode: string) => {
+        if (mode === "Easy") {
+            setMode("Hard");
+            socket.emit('set_mode', "Hard");
+        } else if (mode === "Hard") {
+            setMode("Easy");
+            socket.emit('set_mode', "Easy");
+        }
     }
 
     useEffect(() => {
-        socket.on('ready_state', (data) => {
-            setIsReady(data);
+        socket.on('mode', (data) => {
+            setMode(data.mode)
         });
 
-        socket.on('start_turn_server', (data) => {
-            // setPlaying(true);
-            socket.emit('start_turn_client');
-        })
-
         socket.on('turn', (data) => {
-            setTurn(data.turn)
-        })
+            setMessage(data.message)
+        });
 
         socket.on('time', (data) => {
-            setTime(data.time);
-        })
+            setTime(data.time)
+        });
+
+        socket.on('start_game_server', () => {
+            setPlaying(true);
+            socket.emit('start_game_client');
+        });
+
+        socket.on('start_game', () => {
+            setPlaying(true);
+        });
 
         socket.on('end_game', (data) => {
             // combine tie and winner
-            // setPlaying(false);
-            // setIsAfterMatch(true);
+            setPlaying(false);
+            setIsAfterMatch(true);
             if (data.tie) {
-                // setResult('Tie !');
-                setTurn('Tie !')
+                setResult('Tie !')
             } else {
-                // setResult(`The winner is ${data.winner}`);
-                setTurn(`The winner is ${data.winner}`);
+                setResult(`The winner is ${data.winner}`)
             }
-        })
+            console.log(data)
+        });
 
-        // socket.on('restart', (data) => {
-        //     setPlaying(false);
-        //     setIsAfterMatch(false);
-        // })
+        socket.on('restart', (data) => {
+            setIsReady(false);
+            setPlaying(false);
+            setIsAfterMatch(false);
+            setMessage("");
+        });
+
     }, [socket]);
 
-    return (
-        <>
-            {/* <h3>{message}</h3>
-            <h3>{turn}</h3>
-            <h3>{status}</h3> */}
-
-            {isReady ? (<>
-                <p>Waiting for the other player to be ready...</p>
-            </>) : ( <>
-                <button onClick={handleLeave}>leave this room</button>
+  return ( <> 
+        <h3>{message}</h3>
+        {playing ? (<>
+            <h3>{time}</h3>
+            <button onClick={handleSurrender}>Surrender</button>
+        </>) : (<>
+            {afterMatch ? (<>
+                <button onClick={handleRestart}>Restart</button>
+            </>) : (<>
                 <button
                     onClick={handleReady}
                     className={isReady ? "button-clicked" : "button-default"}
                 >
                     Ready
-                </button> 
+                </button>
+                <p></p>
+                <button 
+                    onClick={() => handleMode(mode)}
+                    disabled={isReady}
+                    className={isReady ? "button-disabled" : "button-default"}
+                >
+                    Mode: {mode}
+                </button>
+                <p></p>
+                <button 
+                    onClick={handleLeave}
+                    disabled={isReady}
+                    className={isReady ? "button-disabled" : "button-default"}
+                >
+                    Leave This Room
+                </button>
             </>)}
-
-            <h3>{turn}</h3>
-            <h3>{time}</h3>
-
-            {/* {playing ? (<>
-                <p>score: {score}</p>
-            </>) : (<>
-                {afterMatch ? (<>
-                    <p>{result}</p>
-                    {/* <p>{tie ? 'tie' : 'not tie'}</p>
-                    <p>winner: {winner}</p> */}
-                    {/* <button onClick={handleRestart}>Restart</button>
-                </>) : (<>
-                    
-                </>)}
-                
-            </>)} */}
-            
-            {/* <p></p> */}
-            
-            
-            
-        </>
-    )
+        </>)
+        }
+    </> );
 }
 
-export default Statusv2
+export default Statusv2;

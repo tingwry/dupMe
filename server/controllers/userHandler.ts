@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
-import { updatePlayerInRoom, updatePlayerInRoom2 } from "./playerController";
+import { updatePlayerInRoom } from "./playerController";
 
 export function userHandler(io: Server, socket: Socket): void {
     const submitName = (data: any) => {

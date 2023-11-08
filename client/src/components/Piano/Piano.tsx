@@ -109,8 +109,8 @@ function Piano() {
     <>
     <button onClick={() => setSound("default")}>default</button>
       <button onClick={() => setSound("cat")}>cat</button>
-    <div style={{display:"none"}}>
-    {/* <div> */}
+    {/* <div style={{display:"none"}}> */}
+    <div>
       <div className="countdown">
         Create a pattern:
         <Countdown

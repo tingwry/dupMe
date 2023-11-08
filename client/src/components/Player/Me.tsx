@@ -23,7 +23,7 @@ function Me() {
     }, [socket])
 
     return (<>
-        <h3>Me</h3>
+        <h3>You</h3>
         <img
             // style={{ width: "100px", height: "100px", flexWrap: "wrap" }}
             className='avatar'
@@ -33,6 +33,7 @@ function Me() {
         <div className='name'>{name}</div>
         <div>current score: {score}</div>
 
+        <div className='reaction-bubble'>{myReaction}</div>
         <h3>Your reaction</h3>
         {allReaction.map((item) => (
             <button 
@@ -42,7 +43,6 @@ function Me() {
                 {item}
             </button>
         ))}
-        <p>{myReaction}</p>
     </>)
 }
 

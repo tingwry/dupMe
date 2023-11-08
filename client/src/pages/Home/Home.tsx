@@ -63,7 +63,7 @@ function Home() {
             <SelectRoom />
 
             <div>
-                <h3>Choose bg color!</h3>
+                <h3>Choose background color!</h3>
                 <button onClick={() => {handleClick("#EEDBB5")}}>
                     Default
                 </button>

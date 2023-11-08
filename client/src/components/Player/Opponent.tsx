@@ -30,7 +30,7 @@ function Opponent() {
         />
         <div className='name'>{name}</div>
         <div>current score: {score}</div>
-        <p>{oppoentReaction}</p>
+        <div className='reaction-bubble'>{oppoentReaction}</div>
     </>)
 }
 

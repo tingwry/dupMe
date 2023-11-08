@@ -1,8 +1,8 @@
-.chat-room-title {
+/* .chat-room-title {
     line-height: 1em;
     margin-top: 50px;
     margin-bottom: 5px;
-}
+} */
 
 .chat-messages {
     background-color: #ffffff;
@@ -40,13 +40,26 @@
     display: flex;
 }
 
-.chat-input-input {
+/* .chat-input-input {
     flex: 1;
     height: 40px;
     padding: 0 10px;
     border: 1px solid #ccc;
     border-radius: 10px;
     margin: 0px 5px 0px;
+} */
+
+.chat-input-input {
+    flex: 1;
+    height: 35px;
+    border-radius: 10px;
+    margin: 0px 5px 0px;
+    padding: 0 10px;
+    border: 2px solid var(--white);
+}
+
+.chat-input-input:focus {
+  border: 2px solid var(--white);
 }
 
 .chat-input-button {

@@ -1,0 +1,22 @@
+.button-clicked {
+    color: var(--white);
+    background-color: var(--brick);
+    border-color: var(--brick);
+}
+
+.button-clicked:hover {
+    color: var(--brick);
+    background-color: var(--white);
+    border-color: var(--brick);
+}
+
+.button-disabled {
+    color: gray;
+    border-color: gray;
+}
+
+.button-disabled:hover, active {
+    color: gray;
+    border-color: gray;
+    background-color: white;
+}

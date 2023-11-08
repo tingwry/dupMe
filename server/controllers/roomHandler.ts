@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
-import { playerInfo, updatePlayerInRoom, updatePlayerInRoom2 } from "./playerController";
+import { playerInfo, updatePlayerInRoom } from "./playerController";
+import { findMode } from "./gameController";
 
 export function roomHandler(io: Server, socket: Socket): void {
     const joinRoom = (roomId: string) => {
@@ -8,14 +9,17 @@ export function roomHandler(io: Server, socket: Socket): void {
         console.log(`${socket.id} join_room ${roomId}`);
 
         const userIndex = users.findIndex((user) => user.sid === socket.id);
+        const roomIndex = rooms.findIndex((room) => (room.roomId === roomId))
         if (userIndex !== -1) {
             users[userIndex].roomId = roomId;
+            const mode = findMode(roomIndex);
             
             // Broadcasting the list of players in the room to all users in the server and the room
             updatePlayerInRoom(io, socket, roomId);
             socket.emit('in_room', roomId);
             io.emit('users', users);
             io.emit('rooms', rooms);
+            io.to(roomId).emit('mode', { mode: mode.mode, createDuration: mode.createDuration, followDuration: mode.followDuration, round: 0 });
         } 
     }
 
@@ -34,6 +38,7 @@ export function roomHandler(io: Server, socket: Socket): void {
             io.emit('users', users);
             io.emit('rooms', rooms);
             socket.emit('profile', { name: users[userIndex].name, avatar: users[userIndex].avatar })
+            socket.to(previousRoomId).emit('receive_reaction', { reaction: "Your opponent's reaction will be shown here"})
             console.log(`${socket.id} leave_room ${previousRoomId}`); 
         }
     }
