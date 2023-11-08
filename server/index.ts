@@ -32,11 +32,10 @@ const io = new Server(server, {
 import { userHandler } from "./controllers/userHandler";
 import { roomHandler } from "./controllers/roomHandler";
 import { gameHandler } from "./controllers/gameHandler";
-import { serverHandler } from "./controllers/serverHandler";
-import { users } from "./dataStorage";
 import { gameHandler2 } from "./controllers/gameV2";
-import { gameHandler3 } from "./controllers/gameV3";
-import { gameHandler4 } from "./controllers/gameV4";
+import { serverHandler } from "./controllers/serverHandler";
+import { chatHandler } from "./controllers/chatHandler";
+// import { gameHandler3 } from "./controllers/gamev3";
 
 
 io.on('connection', (socket) => {  
@@ -45,6 +44,7 @@ io.on('connection', (socket) => {
     roomHandler(io, socket);
     gameHandler2(io, socket);
     serverHandler(io, socket);
+    chatHandler(io, socket);
 })
 
 // Run server

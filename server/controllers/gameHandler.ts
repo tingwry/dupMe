@@ -270,9 +270,40 @@ export function gameHandler(io: Server, socket: Socket): void {
         console.log(`client restart ${roomId}`)
     }
 
+    const surrender = () => {
+        // Info
+        const userInfo = info();
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        // find winner
+        const playersInRoom = users.filter((user) => user.roomId === roomId);
+
+        let winner = playersInRoom[0];
+
+        for (const playerInRoom of playersInRoom) {
+            if (playerInRoom.sid !== sid) {
+                winner = playerInRoom;
+                console.log("winner: ", winner.name);
+
+                playerInRoom.P1 = true;
+            } else {
+                playerInRoom.P1 = false;
+            }
+        }
+
+        io.to(roomId).emit('winner', winner.name);
+        io.to(roomId).emit('end_game', { tie: false, winner: winner.name});
+        io.to(roomId).emit('surrender', { round: 0 });
+        }
+
+    socket.on('ready', ready);
     socket.on('send_notelist', sendNoteList);
     socket.on('ready', ready);
     socket.on('end_create', endCreate);
     socket.on('end_follow', endFollow);
     socket.on('client-restart', clientRestart);
+    socket.on('surrender', surrender);
 }
