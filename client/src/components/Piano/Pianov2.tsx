@@ -1,145 +1,181 @@
-import React, { useEffect, useState } from 'react'
-import socket from '../../socket';
-import Countdown from '../Countdown';
-import './Piano.css'
+import React, { useEffect, useState } from "react";
+import socket from "../../socket";
+import Countdown from "../Countdown";
+import "./Piano.css";
 
 function Pianov2() {
-    const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
-    const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
-    const [notelistReceived, setNotelistReceived] = useState<{ id: number; note: string }[]>([]);
-    const [round, setRound] = useState(1);
+  const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
+  const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
+  const [notelistReceived, setNotelistReceived] = useState<
+    { id: number; note: string }[]
+  >([]);
+  const [round, setRound] = useState(0);
 
-    const [createDuration, setCreateDuration] = useState(5);
-    const [isCreating, setIsCreating] = useState(false);
-    const [followDuration, setFollowDuration] = useState(7);
-    const [isFollowing, setIsFollowing] = useState(false);
+  const [createDuration, setCreateDuration] = useState(10);
+  const [isCreating, setIsCreating] = useState(false);
+  const [followDuration, setFollowDuration] = useState(20);
+  const [isFollowing, setIsFollowing] = useState(false);
 
-    // Click note
-    const handleClickNote = (item: string) => {
-        if (isCreating || isFollowing) {
-            const newNote = { id: notelist.length, note: item };
-            const updatedNotelist = [...notelist, newNote]; //Add in array
-            setNotelist(updatedNotelist);
-            socket.emit('send_notelist', { notelist: updatedNotelist });
-        }
-    };
+  // Click note
+  const [sound, setSound] = useState("Default");
 
-    const startCreate = () => {
-        setNotelist([]);
-        setNotelistReceived([]);
-        setIsCreating(true);
+  const handleClickNote = (item: string) => {
+    if (isCreating || isFollowing) {
+      const newNote = { id: notelist.length, note: item };
+      const updatedNotelist = [...notelist, newNote]; //Add in array
+      setNotelist(updatedNotelist);
+      // socket.emit("send_notelist", { notelist: updatedNotelist });
+
+      if (sound == "Default") {
+        const audio = new Audio(`sounds/${item}.mp3`);
+        audio.play();
+      } else if (sound == "Cat") {
+        const audio = new Audio(`sounds_cat/${item}_cat.mp3`);
+        audio.play();
+      }
     }
+  };
 
-    const startFollow = () => {
-        setNotelist([]);
-        setIsFollowing(true);
+  const handleDelete = () => {
+    if (isCreating || isFollowing) {
+      const updatedNotelist = [...notelist]
+      updatedNotelist.pop();
+      setNotelist(updatedNotelist);
     }
+  }
 
-    const endCreate = () => {
-        socket.emit('end_create');
-        setIsCreating(false);
+  const handleSound = (sound: string) => {
+    if (sound === "Default") {
+        setSound("Cat")
+    } else if (sound === "Cat") {
+        setSound("Default")
     }
+  }
 
-    const endFollow = () => {
-        socket.emit('end_follow', { arrayReceived: notelistReceived, arraySubmit: notelist });
-        setIsFollowing(false);
-        setNotelist([]);
-        setNotelistReceived([]);
-    }
-    
-    const endTurn = () => {
-        socket.emit('end_turn', { arrayReceived: notelistReceived, arraySubmit: notelist });
-        setIsFollowing(false);
-        setNotelist([]);
-        setNotelistReceived([]);
-    };
+  useEffect(() => {
+    socket.emit("send_notelist", { notelist: notelist });
+  }, [notelist])
 
-    useEffect(() => {
-        // Starting the game after both are ready
-        socket.on('start_game', (data) => {
-        setNotelist([]);
-        setNotelistReceived([]);
-        setIsCreating(true);
-        });
+  const endCreate = () => {
+    socket.emit("end_create");
+    setIsCreating(false);
+  };
 
-        socket.on('start_turn', (data) => {
-        setNotelist([]);
-        setNotelistReceived([]);
-        setIsCreating(true);
-        });
+  const endFollow = () => {
+    socket.emit("end_follow", { arrayR: notelistReceived, arrayS: notelist });
+    setNotelist([]);
+    setNotelistReceived([]);
+    setIsFollowing(false);
+  };
 
-        socket.on('next_round', (data) =>{
-        setRound(data.round);
-        setNotelist([]);
-        setNotelistReceived([]);
-        });
+  useEffect(() => {
+    socket.on('mode', (data) => {
+      setCreateDuration(data.createDuration);
+      setFollowDuration(data.followDuration);
+      setRound(data.round);
+    })
 
-        socket.on('start_follow', () => {
-        setNotelist([]);
-        console.log('start_follow');
-        setIsFollowing(true);
-        });
-        
-        socket.on('receive_notelist', (data) => {
-            setNotelistReceived(data.notelist);
-        });
+    socket.on("start_create", (data) => {
+      setNotelist([]);
+      setNotelistReceived([]);
+      setIsCreating(true);
+    });
 
-    }, [socket]);
+    socket.on("receive_notelist", (data) => {
+      setNotelistReceived(data.notelist);
+    });
 
-    return (
-        <>
-            <p>Create a pattern:
-            <Countdown
-                key={`create_${round}`}
-                duration={createDuration}
-                running={isCreating}
-                onTimeout={endCreate}
-            />
-            </p>
+    socket.on("start_follow", () => {
+      setNotelist([]);
+      setIsFollowing(true); // also hide the received note
+    });
 
-            <p>Follow the pattern: 
-            <Countdown
-                key={`follow_${round}`}
-                duration={followDuration}
-                running={isFollowing}
-                onTimeout={endTurn}
-            />
-            </p>
+    socket.on("start_turn", (data) => {
+      setNotelist([]);
+      setNotelistReceived([]);
+      setRound(data.round);
+    });
 
-            <div className="piano-container">
-                {allnotes.map((item) => (
-                    <div
-                        key={item}
-                        onClick={() => {handleClickNote(item);}}
-                    >
-                        <div>{item}</div>
-                    </div>
-                ))}
-            </div>
+    socket.on("restart", (data) => {
+      setNotelist([]);
+      setNotelistReceived([]);
+      setRound(data.round);
+      setIsCreating(false);
+      setIsFollowing(false);
+      console.log("restart");
+    });
 
-            <h3>Display</h3>
-            <div>
-                {notelist.map((item) => (
-                    <div className="display-note" key={item.id}>
-                        {item.note}
-                    </div>
-                ))}
-            </div>            
+    socket.on("surrender", (data) => {
+      setRound(data.round);
+      setIsCreating(false);
+      setIsFollowing(false);
+      console.log("surrender");
+    });
+  }, [socket]);
 
-            <h3>Received</h3>
-            <div>
-                {!isFollowing && (<>
-                    {notelistReceived.map((item) => (
-                    <div className="display-note" key={item.id}>
-                        {item.note}
-                    </div>
-                ))}</>)
-                
-                }
-                
-            </div>
-        </>
-    )
+  return (
+    <>
+    <div style={{display:"none"}}>
+    {/* <div> */}
+      <div className="countdown">
+        Create a pattern:
+        <Countdown
+          key={`create_${round}`}
+          duration={createDuration}
+          running={isCreating}
+          onTimeout={endCreate}
+        />
+      </div>
+
+      <div className="countdown">
+        Follow the pattern:
+        <Countdown
+          key={`follow_${round}`}
+          duration={followDuration}
+          running={isFollowing}
+          onTimeout={endFollow}
+        />
+      </div>
+    </div>
+      <div className="display">
+        <h3>Received</h3>
+        {!isFollowing && (
+          <>
+            {notelistReceived.map((item) => (
+              <div className="display-note" key={item.id}>
+                {item.note}
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+
+      <div className="piano-container">
+        {allnotes.map((item) => (
+          <div
+            key={item}
+            onClick={() => {handleClickNote(item)}}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+
+      
+
+      <div className="display">
+        <h3>Display</h3>
+        {notelist.map((item) => (
+          <div className="display-note" key={item.id}>
+            {item.note}
+          </div>
+        ))}
+      </div>
+      <button onClick={handleDelete}>Delete previous key</button>
+      <button onClick={() => handleSound(sound)}>Piano Sound: {sound}</button>
+    </>
+  );
 }
 
-export default Pianov2
+export default Pianov2;
+

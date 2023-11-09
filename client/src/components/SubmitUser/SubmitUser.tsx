@@ -1,37 +1,30 @@
-import React, { ChangeEvent, useState } from "react";
-import socket from "../../socket";
-import Avatar1Image from "../../assets/pictures/avatar1.png";
+import React, { useEffect, useState } from "react";
+import { AvatarGenerator } from "random-avatar-generator";
+import NameInput from "./NameInput";
+import './User.css'
 
 function SubmitUser() {
-  const [name, setName] = useState<string>("");
+  const generator = new AvatarGenerator();
+  // Get a random avatar
+  const [avatar, setAvatar] = useState(generator.generateRandomAvatar())
 
-  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
-
-  const handleSubmitName = () => {
-    socket.emit("submit_name", name);
-    socket.connect();
-  };
+  const handleRefreshAvatar = () => {
+    setAvatar(generator.generateRandomAvatar());
+    
+  }
   return (
     <>
-      <p>
-        <div style={{ margin: "100px" }}>
-          <img
-            style={{ width: "189px", height: "189px" }}
-            src={Avatar1Image}
-            alt="avatar1"
-          />
-        </div>
-      </p>
-      <input
-        type="text"
-        value={name}
-        onChange={handleNameChange}
-        placeholder="Enter your name"
+      <img
+        // style={{ width: "200px", height: "200px", flexWrap: "wrap" }}
+        className='avatar'
+        src={avatar}
+        alt="avatar1"
       />
       <p></p>
-      <button onClick={handleSubmitName}>Submit</button>
+      <p></p>
+      <button onClick={handleRefreshAvatar}>New avatar</button>
+      <p></p>
+      <NameInput avatar={avatar} />
     </>
   );
 }

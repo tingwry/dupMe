@@ -1,7 +1,7 @@
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
-const socket = io((':3000'), {
-    autoConnect: false
+const socket = io(":3000", {
+  autoConnect: false,
 });
 
 // const socket = io(':3000');

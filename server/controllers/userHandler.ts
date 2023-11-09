@@ -3,10 +3,11 @@ import { users, rooms } from "../dataStorage";
 import { updatePlayerInRoom } from "./playerController";
 
 export function userHandler(io: Server, socket: Socket): void {
-    const submitName = (name: string) => {
+    const submitName = (data: any) => {
         const user = {
             sid: socket.id, 
-            name: name, 
+            name: data.name, 
+            avatar: data.avatar,
             roomId: "main", 
             score: 0, 
             ready: false, 
@@ -20,12 +21,10 @@ export function userHandler(io: Server, socket: Socket): void {
         // Send the list of all connected users to the client
         io.emit('users', users);
         io.emit('rooms', rooms);
+        socket.emit('profile', { name: data.name, avatar: data.avatar })
     }
 
     const disconnect = () => {
-        console.log(`User disconnected: ${socket.id}`);
-        console.log(`connected users: ${users.length}`);
-
         const userIndex = users.findIndex((user) => user.sid === socket.id);
         if (userIndex !== -1) {
             const previousRoomId = users[userIndex].roomId;
@@ -36,8 +35,11 @@ export function userHandler(io: Server, socket: Socket): void {
             io.emit('users', users);
             io.emit('rooms', rooms);
         } else {
-            console.log("User not found");
+            console.log("disconnect: User not found");
         }
+
+        console.log(`User disconnected: ${socket.id}`);
+        console.log(`connected users: ${users.length}`);
     }
 
     socket.on('submit_name', submitName);

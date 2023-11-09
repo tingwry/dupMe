@@ -9,7 +9,6 @@ const app = express();
 app.use(cors());
 
 app.get('/', (req, res) => {
-    
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
@@ -33,25 +32,28 @@ const io = new Server(server, {
 import { userHandler } from "./controllers/userHandler";
 import { roomHandler } from "./controllers/roomHandler";
 import { gameHandler } from "./controllers/gameHandler";
+import { gameHandler2 } from "./controllers/gameV2";
 import { serverHandler } from "./controllers/serverHandler";
-import { users } from "./dataStorage";
+import { chatHandler } from "./controllers/chatHandler";
 // import { gameHandler3 } from "./controllers/gamev3";
 
 
 io.on('connection', (socket) => {  
-    console.log(`Boombayah welcome: ${socket.id}`)
+    console.log(`Boombayah welcome: ${socket.id}`);
     userHandler(io, socket);
     roomHandler(io, socket);
-    // if (users.length !== 0) {
-    //     gameHandler(io, socket);
-    // }
-    gameHandler(io, socket);
+    gameHandler2(io, socket);
     serverHandler(io, socket);
+    chatHandler(io, socket);
 })
 
 // Run server
 const PORT = 3000;
-const SERVER_IP = "127.0.0.1"; 
-server.listen(PORT, SERVER_IP, () => {
-    console.log(`Boombayah is running at http://${SERVER_IP}:${PORT}`);
+// const SERVER_IP = "127.0.0.1"; 
+// server.listen(PORT, SERVER_IP, () => {
+//     console.log(`Boombayah is running at http://${SERVER_IP}:${PORT}`);
+// })
+
+server.listen(PORT, () => {
+    console.log(`Boombayah is running at http://:${PORT}`);
 })

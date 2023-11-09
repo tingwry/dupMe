@@ -43,14 +43,12 @@ export function gameHandler(io: Server, socket: Socket): void {
         // find winner
         const playersInRoom = users.filter((user) => user.roomId === roomId);
 
-        let winner = playersInRoom[0];
-        let tie = false;
+        
 
         if (playersInRoom[0] && playersInRoom[1]) {
 
             // check if tie
             if (playersInRoom[0].score === playersInRoom[1].score) {
-                // tie = true;
                 console.log("this match is a tie");
 
                 playersInRoom.forEach((playerInRoom) => {
@@ -59,9 +57,10 @@ export function gameHandler(io: Server, socket: Socket): void {
                     playerInRoom.P1 = false;
                 });
 
-                io.to(roomId).emit('tie', true);
-                io.to(roomId).emit('end_game', { tie: true, winner: "none" })
+                return { tie: true, winner: "none" };
+                io.to(roomId).emit('end_game', { tie: true, winner: "none" });
             } else {
+                let winner = playersInRoom[0];
                 const maxScore = Math.max(playersInRoom[0].score, playersInRoom[1].score);
                 console.log("max score:", maxScore);
 
@@ -75,18 +74,81 @@ export function gameHandler(io: Server, socket: Socket): void {
                         playerInRoom.P1 = false;
                     }
                 }
-
-                io.to(roomId).emit('winner', winner.name);
-                io.to(roomId).emit('end_game', { tie: false, winner: winner.name})
-            }
-
-            // io.to(roomId).emit('ready_state', false);
+                return { tie: false, winner: winner.name };
+                io.to(roomId).emit('end_game', { tie: false, winner: winner.name });
+            };
         } else {
             console.log("there's some errorrrrrr");
+            return "there's some errorrrrrr";
         }
     }
 
+    // for display only !! the real countdown work at front
+    const countdown = (duration: number, roomId: string, onTimeout: () => void) => {
+        let currentTime = duration;
+        io.to(roomId).emit('time', { time: currentTime });
+        const interval = setInterval(() => {
+            if (currentTime <= 1) {
+                io.to(roomId).emit('time', { time: "" });
+                onTimeout();
+                clearInterval(interval);
+            } else {
+                currentTime--;
+                io.to(roomId).emit('time', { time: currentTime }); 
+            }
+        }, 1000);
+        // io.to(roomId).emit('time', { time: currentTime });
+        // const interval = setInterval(() => {
+        //     if (currentTime === 0) {
+        //         io.to(roomId).emit('time', { time: currentTime });
+        //         onTimeout();
+        //         clearInterval(interval);
+        //     } else {
+        //         currentTime--;
+        //         io.to(roomId).emit('time', { time: currentTime }); 
+        //     }
+        // }, 1000);
+    }
+
+    const readySetGo = (roomId: string, round: number) => {
+        let currentTime = 4;
+        const interval = setInterval(() => {
+            if (currentTime === 0) {
+                io.to(roomId).emit('time', { time: "" });
+                startCreate(socket.id, roomId, round)
+                countdown(5,roomId, () => {console.log('end_create')})
+
+                clearInterval(interval);
+            } else if (currentTime === 1) {
+                io.to(roomId).emit('time', { time: "Go" });
+                currentTime--;
+            } else if (currentTime === 2) {
+                io.to(roomId).emit('time', { time: "Set" });
+                currentTime--;
+            } else if (currentTime === 3) {
+                io.to(roomId).emit('time', { time: "Ready" });
+                currentTime--;
+            } else {
+                socket.emit('turn', { message: "Your turn to create a pattern" });
+                socket.to(roomId).emit('turn', { message: 'Waiting for another player to create a pattern'})
+                currentTime--;
+            }
+
+        }, 1000);
+    }
+
     // For socket
+    const sendNoteList = (data: any) => {
+        // Info
+        const userInfo = info();
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        socket.to(roomId).emit('receive_notelist', data);
+    }
+
     const ready = () => {
         // Info
         const userInfo = info();
@@ -122,19 +184,9 @@ export function gameHandler(io: Server, socket: Socket): void {
                 startCreate(firstPlayerSocketId, roomId, round);
             }
         } else {
+            socket.emit('turn', { message: "Waiting for another player to be ready" });
             console.log('waiting for another player')
         }
-    }
-
-    const sendNoteList = (data: any) => {
-        // Info
-        const userInfo = info();
-        const sid = socket.id
-        const userIndex = userInfo.userIndex;
-        const roomId = userInfo.roomId;
-        const roomIndex = userInfo.roomIndex;
-
-        socket.to(roomId).emit('receive_notelist', data);
     }
 
     const endCreate = () => {
@@ -146,6 +198,10 @@ export function gameHandler(io: Server, socket: Socket): void {
         const roomIndex = userInfo.roomIndex;
 
         socket.to(roomId).emit('start_follow');
+        socket.emit('turn', { message: "Waiting for another player to follow the pattern" });
+        socket.to(roomId).emit('turn', { message: "Your turn to follow the pattern"});
+
+        countdown(7, roomId, () => { console.log('end_follow') });
     }
 
     const endFollow = (data: any) => {
@@ -155,6 +211,8 @@ export function gameHandler(io: Server, socket: Socket): void {
         const userIndex = userInfo.userIndex;
         const roomId = userInfo.roomId;
         const roomIndex = userInfo.roomIndex;
+
+        const name = users[userIndex].name;
 
         // const playersInRoom = users.filter((user) => user.roomId === roomId);
         const arrayR = data.arrayR;
@@ -166,24 +224,23 @@ export function gameHandler(io: Server, socket: Socket): void {
         console.log(`${users[userIndex].name} add ${addScore} = ${users[userIndex].score}`);
 
         io.to(roomId).emit('score', addScore);
+        io.to(roomId).emit('turn', { message: `${name} get ${addScore} score` });
         updatePlayerInRoom(io, socket, roomId);
 
         // check ending
         if (users[userIndex].P1) { // If is P1
-            if (rooms[roomIndex].round === 2) { // Round 2 = end game
-                // console.log(`end_game ${roomId} ${rooms[roomIndex].round}`);
+            if (rooms[roomIndex].round >= 2) { // Round 2 = end game
                 rooms[roomIndex].round = 0;
-                winner(roomId);
+                const result = winner(roomId);
+                io.to(roomId).emit('end_game', result);
             } else { // Round 1 = continues
-                // console.log(`end_round ${roomId} ${rooms[roomIndex].round}`);
                 rooms[roomIndex].round++;
                 const round = rooms[roomIndex].round;
-                startCreate(socket.id, roomId, round);
+                readySetGo(roomId, round)
             }
         } else { // is not P1 = always start the next turn
-            // console.log(`end_turn ${roomId} ${rooms[roomIndex].round}`);
             const round = rooms[roomIndex].round;
-            startCreate(socket.id, roomId, round);
+            readySetGo(roomId, round)
         }
     }
 
@@ -213,9 +270,40 @@ export function gameHandler(io: Server, socket: Socket): void {
         console.log(`client restart ${roomId}`)
     }
 
+    const surrender = () => {
+        // Info
+        const userInfo = info();
+        const sid = socket.id
+        const userIndex = userInfo.userIndex;
+        const roomId = userInfo.roomId;
+        const roomIndex = userInfo.roomIndex;
+
+        // find winner
+        const playersInRoom = users.filter((user) => user.roomId === roomId);
+
+        let winner = playersInRoom[0];
+
+        for (const playerInRoom of playersInRoom) {
+            if (playerInRoom.sid !== sid) {
+                winner = playerInRoom;
+                console.log("winner: ", winner.name);
+
+                playerInRoom.P1 = true;
+            } else {
+                playerInRoom.P1 = false;
+            }
+        }
+
+        io.to(roomId).emit('winner', winner.name);
+        io.to(roomId).emit('end_game', { tie: false, winner: winner.name });
+        io.to(roomId).emit('surrender', { round: 0 });
+    }
+
     socket.on('ready', ready);
     socket.on('send_notelist', sendNoteList);
+    socket.on('ready', ready);
     socket.on('end_create', endCreate);
     socket.on('end_follow', endFollow);
     socket.on('client-restart', clientRestart);
+    socket.on('surrender', surrender);
 }
