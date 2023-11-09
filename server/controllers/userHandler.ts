@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 import { updatePlayerInRoom } from "./playerController";
 
-export function userHandler(io: Server, socket: Socket): void {
+export function userHandler(io: Server, socket: Socket) {
     const submitName = (data: any) => {
         const user = {
             sid: socket.id, 
@@ -48,4 +48,9 @@ export function userHandler(io: Server, socket: Socket): void {
 
     socket.on('submit_name', submitName);
     socket.on('disconnect', disconnect);
+
+    return () => {
+        socket.off('submit_name', submitName);
+        socket.off('disconnect', disconnect);
+    }
 }

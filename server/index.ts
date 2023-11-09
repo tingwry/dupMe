@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
     console.log(`Boombayah welcome: ${socket.id}`);
     userHandler(io, socket);
     roomHandler(io, socket);
-    gameHandler2(io, socket);
+    gameHandler(io, socket);
     serverHandler(io, socket);
     chatHandler(io, socket);
 })

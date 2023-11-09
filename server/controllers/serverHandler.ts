@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { users, rooms } from "../dataStorage";
 
-export function serverHandler(io: Server, socket: Socket): void {
+export function serverHandler(io: Server, socket: Socket) {
     // controllers
     const serverUpdatePlayerInRoom = (roomId: string) => {
         const playerInRoom = users.filter((user) => (user.roomId === roomId));
@@ -42,6 +42,11 @@ export function serverHandler(io: Server, socket: Socket): void {
         io.to(roomId).emit('opponent_ready', false);
     }
 
-    socket.on('server_users', serverUsers)
+    socket.on('server_users', serverUsers);
     socket.on('server_restart', serverRestartRoom);
+
+    return () => {
+        socket.off('server_users', serverUsers);
+        socket.off('server_restart', serverRestartRoom);
+    }
 }

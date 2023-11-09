@@ -23,11 +23,11 @@ function Room() {
             <div className='me'>
                 <Me />
             </div>
-            <div className='status'><Statusv2 /></div>
+            <div className='status'><Status /></div>
             <div className='opponent'>
                 <Opponent />
             </div>
-            <div className='piano'><Pianov2 /></div>
+            <div className='piano'><Piano /></div>
         </div>
     </>)
 }

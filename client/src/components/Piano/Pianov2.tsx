@@ -30,7 +30,6 @@ function Pianov2() {
       setNotelist((prevNotelist) => {
         const newNote = { id: notelist.length, note: item };
         const updatedNotelist = [...prevNotelist, newNote]; //Add in array
-        console.log(updatedNotelist);
         return updatedNotelist;
       });
 
@@ -114,7 +113,19 @@ function Pianov2() {
     });
 
     socket.on("receive_notelist", (data) => {
+      const updatedNotelist = data.notelist;
       setNotelistReceived(data.notelist);
+      if (updatedNotelist.length > 0) {
+        const lastNote = updatedNotelist[updatedNotelist.length - 1].note;
+        console.log(lastNote);
+        if (sound == "Default") {
+          const audio = new Audio(`sounds/${lastNote}.mp3`);
+          audio.play();
+        } else if (sound == "Cat") {
+          const audio = new Audio(`sounds_cat/${lastNote}_cat.mp3`);
+          audio.play();
+        }
+      }
     });
 
     socket.on("start_follow", () => {
@@ -141,7 +152,7 @@ function Pianov2() {
       setIsCreating(false);
       setIsFollowing(false);
     });
-  }, [socket]);
+  }, [socket, notelist, notelistReceived, sound]);
 
   return (
     <>

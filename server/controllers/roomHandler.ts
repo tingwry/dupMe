@@ -3,7 +3,7 @@ import { users, rooms } from "../dataStorage";
 import { playerInfo, updatePlayerInRoom } from "./playerController";
 import { findMode } from "./gameController";
 
-export function roomHandler(io: Server, socket: Socket): void {
+export function roomHandler(io: Server, socket: Socket) {
     const joinRoom = (roomId: string) => {
         socket.join(roomId);
         console.log(`${socket.id} join_room ${roomId}`);
@@ -61,5 +61,11 @@ export function roomHandler(io: Server, socket: Socket): void {
 
     socket.on('join_room', joinRoom);
     socket.on('leave_room', leaveRoom);
-    socket.on('send_reaction', reaction)
+    socket.on('send_reaction', reaction);
+
+    return () => {
+        socket.off('join_room', joinRoom);
+        socket.off('leave_room', leaveRoom);
+        socket.off('send_reaction', reaction);
+    }
 }

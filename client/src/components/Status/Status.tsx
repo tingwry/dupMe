@@ -5,14 +5,15 @@ import './Status.css'
 
 function Status() {
     const [isReady, setIsReady] = useState(false); // data from the server
+    const [opponentReady, setOpponentReady] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [afterMatch, setIsAfterMatch] = useState(false);
 
     const [mode, setMode] = useState("Easy");
+    const [easyModeCSS, setEasyModeCSS] = useState(true);
     
     const [time, setTime] = useState<any>();
     const [message, setMessage] = useState<string>();
-    const [result, setResult] = useState<string>();
     
     const navigate = useNavigate();
 
@@ -24,163 +25,144 @@ function Status() {
     const handleReady = () => {
         socket.emit('ready');
         setIsReady(true);
+        return;
     };
 
     const handleRestart = () => {
         socket.emit("client-restart");
+        return;
       };
     
     const handleSurrender = () => {
         socket.emit("surrender");
+        return;
     };
 
     const handleMode = (mode: string) => {
-        if (mode === "Easy") {
-            setMode("Hard");
-            socket.emit('set_mode', "Hard");
-        } else if (mode === "Hard") {
-            setMode("Easy");
-            socket.emit('set_mode', "Easy");
-        }
+        setMode(mode);
+        socket.emit('set_mode', mode);
+        return;
     }
 
     useEffect(() => {
-        socket.on('mode', (data) => {
-            setMode(data.mode)
-        });
+        if (mode === "Easy") {
+            setEasyModeCSS(true);
+        } else if (mode === "Hard") {
+            setEasyModeCSS(false);
+        }
+    }, [mode])
 
-        socket.on('turn', (data) => {
-            setMessage(data.message)
-        });
+    // socket.on functions
+    const socketMode = (data: any) => {
+        setMode(data.mode);
+    }
+    const socketTurn = (data: any) => {
+        setMessage(data.message);
+    }
+    const socketTime = (data: any) => {
+        setTime(data.time);
+    }
+    const socketOpponentReady = (data: any) => {
+        setOpponentReady(data);
+    }
+    const socketStartGameServer = (data: any) => {
+        setPlaying(true);
+        socket.emit('start_game_client');
+    }
+    const socketStartGame = (data: any) => {
+        setPlaying(true);
+    }
+    const socketEndGame = (data: any) => {
+        setPlaying(false);
+        setIsAfterMatch(true);
+        if (data.tie) {
+            // setResult('Tie !')
+        } else {
+            // setResult(`The winner is ${data.winner}`)
+        }
+        console.log(data)
+    }
+    const socketRestart = (data: any) => {
+        setIsReady(false);
+        setPlaying(false);
+        setIsAfterMatch(false);
+        setMessage("");
+    }
 
-        socket.on('time', (data) => {
-            setTime(data.time)
-        });
+    useEffect(() => {
+        socket.on('mode', socketMode);
+        socket.on('turn', socketTurn);
+        socket.on('time', socketTime);
+        socket.on('opponent_ready', socketOpponentReady)
+        socket.on('start_game_server', socketStartGameServer);
+        socket.on('start_game', socketStartGame);
+        socket.on('end_game', socketEndGame);
+        socket.on('restart', socketRestart);
 
-        socket.on('start_game_server', () => {
-            setPlaying(true);
-            socket.emit('start_game_client');
-        });
-
-        socket.on('start_game', () => {
-            setPlaying(true);
-        });
-
-        socket.on('end_game', (data) => {
-            // combine tie and winner
-            setPlaying(false);
-            setIsAfterMatch(true);
-            if (data.tie) {
-                setResult('Tie !')
-            } else {
-                setResult(`The winner is ${data.winner}`)
-            }
-            console.log(data)
-        });
-
-        socket.on('restart', (data) => {
-            setIsReady(false);
-            setPlaying(false);
-            setIsAfterMatch(false);
-            setMessage("");
-        });
-
-    }, [socket]);
-
-//   useEffect(() => {
-//     socket.on("ready_state", (data) => {
-//       setIsReady(data);
-//     });
-
-//     socket.on("start_turn", (data) => {
-//       setPlaying(true);
-//     });
-
-//     socket.on("score", (data) => {
-//       setScore(data);
-//     });
-
-//     // socket.on('tie', (data) => {
-//     //     setTie(data);
-//     // })
-
-//     // socket.on('winner', (data) => {
-//     //     console.log(data)
-//     //     setWinner(data)
-//     // })
-
-//     socket.on("end_game", (data) => {
-//       // combine tie and winner
-//       setPlaying(false);
-//       setIsAfterMatch(true);
-//       if (data.tie) {
-//         setTie(data.tie);
-//         setResult("Tie !");
-//       } else {
-//         setWinner(data.winner);
-//         setResult(`The winner is ${data.winner}`);
-//       }
-    //   console.log(data);
-//     });
-
-//     socket.on("restart", (data) => {
-//       setPlaying(false);
-//       setIsAfterMatch(false);
-//     });
-//   }, [socket]);
+        return () => {
+            socket.off('mode', socketMode);
+            socket.off('turn', socketTurn);
+            socket.off('time', socketTime);
+            socket.off('opponent_ready', socketOpponentReady)
+            socket.off('start_game_server', socketStartGameServer);
+            socket.off('start_game', socketStartGame);
+            socket.off('end_game', socketEndGame);
+            socket.off('restart', socketRestart);
+        }
+    }, [socket, mode, message, time, opponentReady, playing, afterMatch, isReady]);
 
   return ( <> 
         <h3>{message}</h3>
         {playing ? (<>
-            {/* <h3>{message}</h3> */}
             <h3>{time}</h3>
             <button onClick={handleSurrender}>Surrender</button>
         </>) : (<>
             {afterMatch ? (<>
                 <button onClick={handleRestart}>Restart</button>
-            </>) : (<>
-                
-                {isReady ? (<>
-                    {/* <h3>{message}</h3> */}
-                </>) : (<>
-                    
-                    <button onClick={handleLeave}>Leave This Room</button>
+            </>) : (<div className="not-playing-not-aftermatch">
+                <div>
                     <button
                         onClick={handleReady}
-                        className={isReady ? "button-clicked" : "button-default"}
+                        className={isReady ? "button-ready-clicked" : "button-default"}
                     >
                         Ready
                     </button>
-                    <p></p>
-                    <button onClick={() => handleMode(mode)}>
-                        {mode}
+                </div>
+                <div aria-disabled={ isReady || opponentReady }>
+                    <div className="sound-title">Mode: </div>
+                    <button 
+                        onClick={() => handleMode("Easy")}
+                        className={
+                            `${easyModeCSS ? "button-clicked" : "button-default"} 
+                            ${isReady || opponentReady ? "button-disabled" : "button-default"}`
+                        }
+                        disabled = { isReady || opponentReady }
+                    >
+                        Easy
                     </button>
-                </>)}
-            </>)}
+                    <button 
+                        onClick={() => handleMode("Hard")}
+                        className={
+                            `${easyModeCSS ? "button-default" : "button-clicked"} 
+                            ${isReady || opponentReady ? "button-disabled" : "button-default"}`
+                        }
+                    >
+                        Hard
+                    </button>
+                </div>
+                <div>
+                    <button 
+                        onClick={handleLeave}
+                        disabled={isReady}
+                        className={isReady ? "button-disabled" : "button-default"}
+                    >
+                        Leave This Room
+                    </button>
+                </div>
+                
+            </div>)}
         </>)
         }
-        
-        {/* {isReady ? (<>
-            <h3>{message}</h3>
-            <h3>{time}</h3>
-            <button onClick={handleSurrender}>surrender</button>
-            <button onClick={handleRestart}>Restart</button>
-        </>) : (<>
-            <button onClick={handleLeave}>leave this room</button>
-            <button
-                onClick={handleReady}
-                className={isReady ? "button-clicked" : "button-default"}
-            >
-                Ready
-            </button>
-            <button onClick={handleModeEasy}>Easy</button>
-            <button onClick={handleModeHard}>Hard</button>
-            <p>
-                <Link to="/chat">
-                    <button> Chat Room </button>
-                </Link>
-            </p>
-        </>)}  */}
     </> );
 }
 
