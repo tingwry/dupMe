@@ -160,7 +160,7 @@ function Piano() {
       socket.off("restart", socketRestart);
       socket.off("surrender", socketSurrender);
     };
-  }, [socket, notelist, notelistReceived, sound]);
+  }, [socket, notelist, notelistReceived, sound, round]);
 
   return (
     <>
