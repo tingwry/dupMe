@@ -52,6 +52,10 @@
     margin: 0 5px 10px;
 }
 
+.sound-container {
+    margin-bottom: 10px;
+}
+
 .sound-title {
     display: inline-block;
     font-family: 'Press Start 2P', 'inherit';
