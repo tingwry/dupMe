@@ -113,15 +113,17 @@ function Statusv2() {
         </>) : (<>
             {afterMatch ? (<>
                 <button onClick={handleRestart}>Restart</button>
-            </>) : (<>
-                <button
-                    onClick={handleReady}
-                    className={isReady ? "button-ready-clicked" : "button-default"}
-                >
-                    Ready
-                </button>
-                <p></p>
+            </>) : (<div className="not-playing-not-aftermatch">
+                <div>
+                    <button
+                        onClick={handleReady}
+                        className={isReady ? "button-ready-clicked" : "button-default"}
+                    >
+                        Ready
+                    </button>
+                </div>
                 <div aria-disabled={ isReady || opponentReady }>
+                    <div className="sound-title">Mode: </div>
                     <button 
                         onClick={() => handleMode("Easy")}
                         className={
@@ -142,16 +144,17 @@ function Statusv2() {
                         Hard
                     </button>
                 </div>
-            
-                <p></p>
-                <button 
-                    onClick={handleLeave}
-                    disabled={isReady}
-                    className={isReady ? "button-disabled" : "button-default"}
-                >
-                    Leave This Room
-                </button>
-            </>)}
+                <div>
+                    <button 
+                        onClick={handleLeave}
+                        disabled={isReady}
+                        className={isReady ? "button-disabled" : "button-default"}
+                    >
+                        Leave This Room
+                    </button>
+                </div>
+                
+            </div>)}
         </>)
         }
     </> );

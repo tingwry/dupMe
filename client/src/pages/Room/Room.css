@@ -26,7 +26,7 @@
 .status {
     grid-area: status;
     width: 600px;
-    height: 220px;
+    height: 210px;
     overflow-wrap: break-word;
     padding: 20px;
 }
@@ -35,7 +35,7 @@
     grid-area: piano;
     /* align-content: center; */
     /* justify-content: center; */
-    /* background-color: azure; */
+    width: 600px;
     padding: 0;
 }
 

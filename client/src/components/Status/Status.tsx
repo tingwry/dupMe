@@ -143,6 +143,7 @@ function Status() {
                 {isReady ? (<>
                     {/* <h3>{message}</h3> */}
                 </>) : (<>
+                    
                     <button onClick={handleLeave}>Leave This Room</button>
                     <button
                         onClick={handleReady}

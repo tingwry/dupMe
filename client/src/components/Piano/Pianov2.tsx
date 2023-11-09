@@ -5,7 +5,6 @@ import "./Piano.css";
 
 function Pianov2() {
   const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
-  // const keyboardNotes = ["c", "d", "e", "f", "g", "a", "b"];
 
   const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
   const [notelistReceived, setNotelistReceived] = useState<
@@ -22,33 +21,18 @@ function Pianov2() {
   const [sound, setSound] = useState("Default");
   const [soundCSS, setSoundCSS] = useState(true);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat) {
-        return;
-      } else {
-        console.log(event.key);
-      }
-    };
-  
-    const handleKeyUp = () => {};
-  
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-  
-    // Cleanup function
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-
   const handleClickNote = (item: string) => {
     if (isCreating || isFollowing) {
-      const newNote = { id: notelist.length, note: item };
-      const updatedNotelist = [...notelist, newNote]; //Add in array
-      setNotelist(updatedNotelist);
-      // socket.emit("send_notelist", { notelist: updatedNotelist });
+      // const newNote = { id: notelist.length, note: item };
+      // console.log(newNote);
+      // const updatedNotelist = [...notelist, newNote]; //Add in array
+      // setNotelist(updatedNotelist);
+      setNotelist((prevNotelist) => {
+        const newNote = { id: notelist.length, note: item };
+        const updatedNotelist = [...prevNotelist, newNote]; //Add in array
+        console.log(updatedNotelist);
+        return updatedNotelist;
+      });
 
       if (sound == "Default") {
         const audio = new Audio(`sounds/${item}.mp3`);
@@ -57,8 +41,29 @@ function Pianov2() {
         const audio = new Audio(`sounds_cat/${item}_cat.mp3`);
         audio.play();
       }
+      return;
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) {
+        return;
+      } else {
+        const note = event.key.toUpperCase()
+        if (allnotes.includes(note)) {
+          handleClickNote(note);
+        }
+      }
+    };
+  
+    window.addEventListener('keydown', handleKeyDown);
+  
+    // Cleanup function
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [notelist]);
 
   const handleDelete = () => {
     if (isCreating || isFollowing) {
@@ -216,4 +221,3 @@ function Pianov2() {
 }
 
 export default Pianov2;
-

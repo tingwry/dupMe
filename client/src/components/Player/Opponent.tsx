@@ -36,7 +36,7 @@ function Opponent() {
       <div className="name">{name}</div>
       <div>current score: {score}</div>
       <div className="reaction-bubble">
-        <img src={`${oppoentReaction}`} style={{ width: 25, height: 25 }} />
+        <img src={`${oppoentReaction}`} style={{ width: 30, height: 30 }} />
       </div>
     </>
   );

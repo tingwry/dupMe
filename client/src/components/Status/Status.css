@@ -33,3 +33,6 @@
     border-color: var(--brick);
 } 
 
+.not-playing-not-aftermatch > div {
+    margin-top: 10px;
+}

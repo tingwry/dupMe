@@ -8,8 +8,6 @@ import Me from "../../components/Player/Me";
 import Opponent from "../../components/Player/Opponent";
 import Pianov2 from "../../components/Piano/Pianov2";
 import Statusv2 from "../../components/Status/Statusv2";
-import Pianov3 from "../../components/Piano/Pianov3";
-import Statusv3 from "../../components/Status/Statusv3";
 import { useEffect, useState } from "react";
 
 function Room() {
