@@ -39,7 +39,7 @@ export function serverHandler(io: Server, socket: Socket): void {
         // send info to client
         serverUpdatePlayerInRoom(roomId)
         io.to(roomId).emit('restart', { round: 0 });
-        io.to(roomId).emit('ready_state', false);
+        io.to(roomId).emit('opponent_ready', false);
     }
 
     socket.on('server_users', serverUsers)

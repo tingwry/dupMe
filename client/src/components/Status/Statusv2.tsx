@@ -10,6 +10,7 @@ function Statusv2() {
     const [afterMatch, setIsAfterMatch] = useState(false);
 
     const [mode, setMode] = useState("Easy");
+    const [easyModeCSS, setEasyModeCSS] = useState(true);
     
     const [time, setTime] = useState<any>();
     const [message, setMessage] = useState<string>();
@@ -22,15 +23,8 @@ function Statusv2() {
     };
 
     const handleReady = () => {
-        if (isReady) {
-            setIsReady(false);
-            socket.emit('ready', false);
-            console.log('not ready');
-        } else {
-            socket.emit('ready', true);
-            setIsReady(true);
-            console.log('ready');
-        }
+        socket.emit('ready');
+        setIsReady(true);
     };
 
     const handleRestart = () => {
@@ -41,15 +35,28 @@ function Statusv2() {
         socket.emit("surrender");
     };
 
+    // const handleMode = (mode: string) => {
+    //     if (mode === "Easy") {
+    //         setMode("Hard");
+    //         socket.emit('set_mode', "Hard");
+    //     } else if (mode === "Hard") {
+    //         setMode("Easy");
+    //         socket.emit('set_mode', "Easy");
+    //     }
+    // }
+
     const handleMode = (mode: string) => {
-        if (mode === "Easy") {
-            setMode("Hard");
-            socket.emit('set_mode', "Hard");
-        } else if (mode === "Hard") {
-            setMode("Easy");
-            socket.emit('set_mode', "Easy");
-        }
+        setMode(mode);
+        socket.emit('set_mode', mode);
     }
+
+    useEffect(() => {
+        if (mode === "Easy") {
+            setEasyModeCSS(true);
+        } else if (mode === "Hard") {
+            setEasyModeCSS(false);
+        }
+    }, [mode])
 
     useEffect(() => {
         socket.on('mode', (data) => {
@@ -109,18 +116,33 @@ function Statusv2() {
             </>) : (<>
                 <button
                     onClick={handleReady}
-                    className={isReady ? "button-clicked" : "button-default"}
+                    className={isReady ? "button-ready-clicked" : "button-default"}
                 >
-                    Ready: {isReady ? "Ready" : "Not Ready"}
+                    Ready
                 </button>
                 <p></p>
-                <button 
-                    onClick={() => handleMode(mode)}
-                    disabled={ isReady || opponentReady }
-                    className={ isReady || opponentReady ? "button-disabled" : "button-default" }
-                >
-                    Mode: {mode}
-                </button>
+                <div aria-disabled={ isReady || opponentReady }>
+                    <button 
+                        onClick={() => handleMode("Easy")}
+                        className={
+                            `${easyModeCSS ? "button-clicked" : "button-default"} 
+                            ${isReady || opponentReady ? "button-disabled" : "button-default"}`
+                        }
+                        disabled = { isReady || opponentReady }
+                    >
+                        Easy
+                    </button>
+                    <button 
+                        onClick={() => handleMode("Hard")}
+                        className={
+                            `${easyModeCSS ? "button-default" : "button-clicked"} 
+                            ${isReady || opponentReady ? "button-disabled" : "button-default"}`
+                        }
+                    >
+                        Hard
+                    </button>
+                </div>
+            
                 <p></p>
                 <button 
                     onClick={handleLeave}

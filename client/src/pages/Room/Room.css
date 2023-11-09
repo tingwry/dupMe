@@ -1,5 +1,5 @@
 .room-title {
-    line-height: 1em;
+    margin-top: 10px;
     margin-bottom: 0;
 }
 
@@ -26,17 +26,17 @@
 .status {
     grid-area: status;
     width: 600px;
-    height: 200px;
+    height: 220px;
     overflow-wrap: break-word;
     padding: 20px;
-    background-color: aqua;
 }
 
 .piano {
     grid-area: piano;
-    align-content: center;
-    justify-content: center;
+    /* align-content: center; */
+    /* justify-content: center; */
     /* background-color: azure; */
+    padding: 0;
 }
 
 /* v1 */
@@ -58,15 +58,13 @@
         'me status status status opponent'
         'me piano piano piano opponent'
         'me piano piano piano opponent';
-    gap: 10px;
-    padding: 10px;
+    /* padding: 10px; */
     align-content: center;
     justify-content: center;
 }
 
 .player-container > div {
-    /* background-color: var(--beige); */
     text-align: center;
     margin: 0;
-    padding: 10px 0;
+    padding: 0;
 }

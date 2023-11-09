@@ -38,7 +38,8 @@ export function roomHandler(io: Server, socket: Socket): void {
             io.emit('users', users);
             io.emit('rooms', rooms);
             socket.emit('profile', { name: users[userIndex].name, avatar: users[userIndex].avatar })
-            socket.to(previousRoomId).emit('receive_reaction', { reaction: "Your opponent's reaction will be shown here"})
+            socket.to(previousRoomId).emit('receive_reaction', { reaction: "Blank"})
+            io.to(previousRoomId).emit('opponent_ready', false);
             console.log(`${socket.id} leave_room ${previousRoomId}`); 
         }
     }
