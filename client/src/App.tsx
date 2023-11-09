@@ -5,6 +5,7 @@ import Room from "./pages/Room/Room";
 import Home from "./pages/Home/Home";
 import HowToPlay from "./components/HowToPlay";
 import ChatRoom from "./components/ChatRoom/ChatRoom";
+import SupportUs from "./pages/SupportUs/SupportUs";
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                 <Route path="/room" element={<Room />} />
                 <Route path="/how-to-play" element={<HowToPlay />} />
                 <Route path="/chat" element={<ChatRoom />} />
+                <Route path="/support-us" element={<SupportUs />} />
             </Routes>
             </div>
         </div>

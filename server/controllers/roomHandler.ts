@@ -19,6 +19,7 @@ export function roomHandler(io: Server, socket: Socket): void {
             socket.emit('in_room', roomId);
             io.emit('users', users);
             io.emit('rooms', rooms);
+            socket.emit('receive_reaction', { reaction: "/pictures/blank.png" })
             io.to(roomId).emit('mode', { mode: mode.mode, createDuration: mode.createDuration, followDuration: mode.followDuration, round: 0 });
         } 
     }
@@ -37,8 +38,9 @@ export function roomHandler(io: Server, socket: Socket): void {
             updatePlayerInRoom(io, socket, previousRoomId);
             io.emit('users', users);
             io.emit('rooms', rooms);
-            socket.emit('profile', { name: users[userIndex].name, avatar: users[userIndex].avatar })
-            socket.to(previousRoomId).emit('receive_reaction', { reaction: "Blank"})
+            socket.emit('profile', { name: users[userIndex].name, avatar: users[userIndex].avatar });
+            socket.to(previousRoomId).emit('receive_reaction', { reaction: "/pictures/blank.png" });
+            socket.to(previousRoomId).emit('opponent', { avatar : "/pictures/beige.png" })
             io.to(previousRoomId).emit('opponent_ready', false);
             console.log(`${socket.id} leave_room ${previousRoomId}`); 
         }

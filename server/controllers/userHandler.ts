@@ -34,6 +34,10 @@ export function userHandler(io: Server, socket: Socket): void {
             // Broadcasting the list of players in the room to all users in the server and the room
             io.emit('users', users);
             io.emit('rooms', rooms);
+            socket.to(previousRoomId).emit('receive_reaction', { reaction: "/pictures/blank.png" });
+            socket.to(previousRoomId).emit('opponent', { avatar : "/pictures/beige.png" });
+            io.to(previousRoomId).emit('opponent_ready', false);
+
         } else {
             console.log("disconnect: User not found");
         }

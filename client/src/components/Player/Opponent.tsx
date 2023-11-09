@@ -12,7 +12,7 @@ import blank from "../../assets/pictures/blank.png";
 
 function Opponent() {
   const [name, setName] = useState<string>();
-  const [avatar, setAvatar] = useState<string>();
+  const [avatar, setAvatar] = useState<string>("/pictures/beige.png");
   const [score, setScore] = useState(0);
 
   const [oppoentReaction, settOpponenReaction] = useState<string>(blank);

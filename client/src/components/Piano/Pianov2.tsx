@@ -173,7 +173,7 @@ function Pianov2() {
             </div>
             ))}
         </div>
-        <button onClick={handleDelete}>Delete previous key</button>
+        <button onClick={handleDelete}>Delete previous note</button>
         <p></p>
         <div className="sound-container">
             <div className="sound-title">Piano Sound: </div>

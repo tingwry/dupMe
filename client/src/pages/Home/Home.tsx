@@ -124,6 +124,10 @@ function Home() {
           <Link to="/how-to-play">
             <button>How to Play</button>
           </Link>
+          <p></p>
+          <Link to="/support-us">
+            <button>Support Us</button>
+          </Link>
           <Decorations />
         </>
       )}
