@@ -49,17 +49,20 @@ export function gameHandler2(io: Server, socket: Socket): void {
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
             // Set ready to true
             users[userIndex].ready = true;
-            // io.to(sid).emit('ready_state', true);
-
+        
             // Check both players
             const playersInRoom = users.filter((user) => user.roomId === roomId);
             if (playersInRoom[0] && playersInRoom[1]) {
+                // for selecting mode
+                socket.to(roomId).emit('opponent_ready', true);
+
                 const bothPlayersReady = playersInRoom.every((player) => player.ready);
 
                 if (bothPlayersReady) {
                     let firstPlayer = playersInRoom.find((player) => player.P1);
                     let p1sid = "";
                     let p1name = "";
+                    let defaultp1 = "";
                     if (!firstPlayer) {
                         p1sid = Math.random() < 0.5 ? playersInRoom[0].sid : playersInRoom[1].sid;
         
@@ -68,16 +71,18 @@ export function gameHandler2(io: Server, socket: Socket): void {
                             if (user.sid === p1sid) {
                                 user.P1 = true;
                                 p1name = user.name;
+                                defaultp1 = `${p1name} is the first player at random`
                             }
                         });
                     } else {
                         p1sid = firstPlayer.sid;
                         p1name = firstPlayer.name;
+                        defaultp1 = `The winner ${p1name} is the first player`
                     }
 
                     rooms[roomIndex].round = 1;
 
-                    io.to(roomId).emit('turn', { message: `${p1name} is the first player`});
+                    io.to(roomId).emit('turn', { message: defaultp1 });
                     io.to(roomId).emit('start_game');
                     io.to(p1sid).emit('start_game_server');
                 } else {
@@ -86,7 +91,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
                 }
             } else {
                 socket.emit('turn', { message: "Waiting for another player" });
-                console.log('waiting for another player')
+                console.log('waiting for another player');
             }
         }
         return;
@@ -213,7 +218,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
             updatePlayerInRoom(io, socket, roomId);
 
             io.to(roomId).emit('restart', { round: 0 });
-            io.to(roomId).emit('ready_state', false);
+            io.to(roomId).emit('opponent_ready', false);
 
             console.log(`client restart ${roomId}`)
         }

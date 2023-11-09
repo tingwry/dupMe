@@ -18,6 +18,7 @@ function Pianov2() {
 
   // Click note
   const [sound, setSound] = useState("Default");
+  const [soundCSS, setSoundCSS] = useState(true);
 
   const handleClickNote = (item: string) => {
     if (isCreating || isFollowing) {
@@ -45,16 +46,15 @@ function Pianov2() {
   }
 
   const handleSound = (sound: string) => {
+    setSound(sound);
     if (sound === "Default") {
-        setSound("Cat")
+        setSoundCSS(true);
     } else if (sound === "Cat") {
-        setSound("Default")
+        setSoundCSS(false);
     }
+    
+    console.log(sound)
   }
-
-  useEffect(() => {
-    socket.emit("send_notelist", { notelist: notelist });
-  }, [notelist])
 
   const endCreate = () => {
     socket.emit("end_create");
@@ -67,6 +67,10 @@ function Pianov2() {
     setNotelistReceived([]);
     setIsFollowing(false);
   };
+
+  useEffect(() => {
+    socket.emit("send_notelist", { notelist: notelist });
+  }, [notelist])
 
   useEffect(() => {
     socket.on('mode', (data) => {
@@ -115,64 +119,77 @@ function Pianov2() {
 
   return (
     <>
-    <div style={{display:"none"}}>
-    {/* <div> */}
-      <div className="countdown">
-        Create a pattern:
-        <Countdown
-          key={`create_${round}`}
-          duration={createDuration}
-          running={isCreating}
-          onTimeout={endCreate}
-        />
-      </div>
+        <div style={{display:"none"}}>
+        {/* <div> */}
+        <div className="countdown">
+            Create a pattern:
+            <Countdown
+            key={`create_${round}`}
+            duration={createDuration}
+            running={isCreating}
+            onTimeout={endCreate}
+            />
+        </div>
 
-      <div className="countdown">
-        Follow the pattern:
-        <Countdown
-          key={`follow_${round}`}
-          duration={followDuration}
-          running={isFollowing}
-          onTimeout={endFollow}
-        />
-      </div>
-    </div>
-      <div className="display">
-        <h3>Received</h3>
-        {!isFollowing && (
-          <>
-            {notelistReceived.map((item) => (
-              <div className="display-note" key={item.id}>
-                {item.note}
-              </div>
+        <div className="countdown">
+            Follow the pattern:
+            <Countdown
+            key={`follow_${round}`}
+            duration={followDuration}
+            running={isFollowing}
+            onTimeout={endFollow}
+            />
+        </div>
+        </div>
+        <div className="display">
+            <div className="display-title">Received</div>
+            {!isFollowing && (
+            <>
+                {notelistReceived.map((item) => (
+                <div className="display-note" key={item.id}>
+                    {item.note}
+                </div>
+                ))}
+            </>
+            )}
+        </div>
+
+        <div className="piano-container">
+            {allnotes.map((item) => (
+            <div
+                key={item}
+                onClick={() => {handleClickNote(item)}}
+            >
+                {item}
+            </div>
             ))}
-          </>
-        )}
-      </div>
+        </div>
 
-      <div className="piano-container">
-        {allnotes.map((item) => (
-          <div
-            key={item}
-            onClick={() => {handleClickNote(item)}}
-          >
-            {item}
-          </div>
-        ))}
-      </div>
-
-      
-
-      <div className="display">
-        <h3>Display</h3>
-        {notelist.map((item) => (
-          <div className="display-note" key={item.id}>
-            {item.note}
-          </div>
-        ))}
-      </div>
-      <button onClick={handleDelete}>Delete previous key</button>
-      <button onClick={() => handleSound(sound)}>Piano Sound: {sound}</button>
+        <div className="display">
+            <div className="display-title">Display</div>
+            {notelist.map((item) => (
+            <div className="display-note" key={item.id}>
+                {item.note}
+            </div>
+            ))}
+        </div>
+        <button onClick={handleDelete}>Delete previous key</button>
+        <p></p>
+        <div>
+            <div className="sound-title">Piano Sound: </div>
+            <button 
+                onClick={() => handleSound("Default")}
+                className={ soundCSS ? "button-clicked" : "button-default" }
+            >
+                Default
+            </button>
+            <button 
+                onClick={() => handleSound("Cat")}
+                className={ soundCSS ? "button-default" : "button-clicked" }
+            >
+                Cat
+            </button>
+        </div>
     </>
   );
 }

@@ -29,10 +29,10 @@ export function readySetGo (io: Server, socket: Socket, roomId: string, onTimeou
         } else if (currentTime === 3) {
             currentTime--;
             io.to(roomId).emit('time', { time: "Ready" });
-        } else {
-            currentTime--;
             socket.emit('turn', { message: "Your turn to create a pattern" });
             socket.to(roomId).emit('turn', { message: 'Waiting for another player to create a pattern'})
+        } else {
+            currentTime--;
         }
     }, 1000);
 }

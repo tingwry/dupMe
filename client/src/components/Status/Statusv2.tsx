@@ -5,14 +5,15 @@ import './Status.css'
 
 function Statusv2() {
     const [isReady, setIsReady] = useState(false); // data from the server
+    const [opponentReady, setOpponentReady] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [afterMatch, setIsAfterMatch] = useState(false);
 
     const [mode, setMode] = useState("Easy");
+    const [easyModeCSS, setEasyModeCSS] = useState(true);
     
     const [time, setTime] = useState<any>();
     const [message, setMessage] = useState<string>();
-    const [result, setResult] = useState<string>();
     
     const navigate = useNavigate();
 
@@ -34,15 +35,28 @@ function Statusv2() {
         socket.emit("surrender");
     };
 
+    // const handleMode = (mode: string) => {
+    //     if (mode === "Easy") {
+    //         setMode("Hard");
+    //         socket.emit('set_mode', "Hard");
+    //     } else if (mode === "Hard") {
+    //         setMode("Easy");
+    //         socket.emit('set_mode', "Easy");
+    //     }
+    // }
+
     const handleMode = (mode: string) => {
-        if (mode === "Easy") {
-            setMode("Hard");
-            socket.emit('set_mode', "Hard");
-        } else if (mode === "Hard") {
-            setMode("Easy");
-            socket.emit('set_mode', "Easy");
-        }
+        setMode(mode);
+        socket.emit('set_mode', mode);
     }
+
+    useEffect(() => {
+        if (mode === "Easy") {
+            setEasyModeCSS(true);
+        } else if (mode === "Hard") {
+            setEasyModeCSS(false);
+        }
+    }, [mode])
 
     useEffect(() => {
         socket.on('mode', (data) => {
@@ -56,6 +70,10 @@ function Statusv2() {
         socket.on('time', (data) => {
             setTime(data.time)
         });
+
+        socket.on('opponent_ready', (data) => {
+            setOpponentReady(data);
+        })
 
         socket.on('start_game_server', () => {
             setPlaying(true);
@@ -71,9 +89,9 @@ function Statusv2() {
             setPlaying(false);
             setIsAfterMatch(true);
             if (data.tie) {
-                setResult('Tie !')
+                // setResult('Tie !')
             } else {
-                setResult(`The winner is ${data.winner}`)
+                // setResult(`The winner is ${data.winner}`)
             }
             console.log(data)
         });
@@ -98,18 +116,33 @@ function Statusv2() {
             </>) : (<>
                 <button
                     onClick={handleReady}
-                    className={isReady ? "button-clicked" : "button-default"}
+                    className={isReady ? "button-ready-clicked" : "button-default"}
                 >
                     Ready
                 </button>
                 <p></p>
-                <button 
-                    onClick={() => handleMode(mode)}
-                    disabled={isReady}
-                    className={isReady ? "button-disabled" : "button-default"}
-                >
-                    Mode: {mode}
-                </button>
+                <div aria-disabled={ isReady || opponentReady }>
+                    <button 
+                        onClick={() => handleMode("Easy")}
+                        className={
+                            `${easyModeCSS ? "button-clicked" : "button-default"} 
+                            ${isReady || opponentReady ? "button-disabled" : "button-default"}`
+                        }
+                        disabled = { isReady || opponentReady }
+                    >
+                        Easy
+                    </button>
+                    <button 
+                        onClick={() => handleMode("Hard")}
+                        className={
+                            `${easyModeCSS ? "button-default" : "button-clicked"} 
+                            ${isReady || opponentReady ? "button-disabled" : "button-default"}`
+                        }
+                    >
+                        Hard
+                    </button>
+                </div>
+            
                 <p></p>
                 <button 
                     onClick={handleLeave}
