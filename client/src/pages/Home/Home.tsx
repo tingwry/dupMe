@@ -45,7 +45,6 @@ function Home() {
     });
 
     socket.on("profile", (data) => {
-      console.log(data);
       setName(data.name);
       setAvatar(data.avatar);
     });

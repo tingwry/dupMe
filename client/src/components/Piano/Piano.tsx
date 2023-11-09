@@ -5,7 +5,7 @@ import "./Piano.css";
 
 function Piano() {
   const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
-  // const keyboardNotes = ["c", "d", "e", "f", "g", "a", "b"];
+  
 
   const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
   const [notelistReceived, setNotelistReceived] = useState<
@@ -22,15 +22,7 @@ function Piano() {
   const [sound, setSound] = useState("default");
 
   
-  const handleKeyDown = (event: KeyboardEvent) => {
-    console.log(event)
-  }
-
-  const handleKeyUp = () => {
-
-  }
-  window.addEventListener('keydown', handleKeyDown)
-  window.addEventListener('keyup', handleKeyUp)
+  
 
 
   const handleClickNote = (item: string) => {

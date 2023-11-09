@@ -26,7 +26,6 @@ function Opponent() {
 
     socket.on("receive_reaction", (data) => {
       settOpponenReaction(data.reaction);
-      console.log(data.reaction);
     });
   }, [socket]);
 

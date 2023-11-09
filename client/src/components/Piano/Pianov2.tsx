@@ -5,6 +5,8 @@ import "./Piano.css";
 
 function Pianov2() {
   const allnotes = ["C", "D", "E", "F", "G", "A", "B"];
+  // const keyboardNotes = ["c", "d", "e", "f", "g", "a", "b"];
+
   const [notelist, setNotelist] = useState<{ id: number; note: string }[]>([]);
   const [notelistReceived, setNotelistReceived] = useState<
     { id: number; note: string }[]
@@ -19,6 +21,27 @@ function Pianov2() {
   // Click note
   const [sound, setSound] = useState("Default");
   const [soundCSS, setSoundCSS] = useState(true);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) {
+        return;
+      } else {
+        console.log(event.key);
+      }
+    };
+  
+    const handleKeyUp = () => {};
+  
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+  
+    // Cleanup function
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
 
   const handleClickNote = (item: string) => {
     if (isCreating || isFollowing) {
@@ -106,14 +129,12 @@ function Pianov2() {
       setRound(data.round);
       setIsCreating(false);
       setIsFollowing(false);
-      console.log("restart");
     });
 
     socket.on("surrender", (data) => {
       setRound(data.round);
       setIsCreating(false);
       setIsFollowing(false);
-      console.log("surrender");
     });
   }, [socket]);
 
