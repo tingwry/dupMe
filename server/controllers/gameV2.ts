@@ -38,7 +38,7 @@ export function gameHandler2(io: Server, socket: Socket): void {
         }
     }
 
-    const ready = () => {
+    const ready = (ready: boolean) => {
         // Info
         const userInfo = playerInfo(io, socket);
         const sid = socket.id
@@ -48,12 +48,16 @@ export function gameHandler2(io: Server, socket: Socket): void {
 
         if ((userIndex !== -1) && roomId && (roomIndex !== -1)) {
             // Set ready to true
-            users[userIndex].ready = true;
+            // users[userIndex].ready = true;
+            users[userIndex].ready = ready;
             // io.to(sid).emit('ready_state', true);
 
             // Check both players
             const playersInRoom = users.filter((user) => user.roomId === roomId);
             if (playersInRoom[0] && playersInRoom[1]) {
+                // for selecting mode
+                socket.to(roomId).emit('opponent_ready', ready);
+
                 const bothPlayersReady = playersInRoom.every((player) => player.ready);
 
                 if (bothPlayersReady) {

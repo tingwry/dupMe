@@ -172,6 +172,7 @@ function Pianov2() {
         ))}
       </div>
       <button onClick={handleDelete}>Delete previous key</button>
+      <p></p>
       <button onClick={() => handleSound(sound)}>Piano Sound: {sound}</button>
     </>
   );

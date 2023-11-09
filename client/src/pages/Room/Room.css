@@ -25,10 +25,11 @@
 /* v2 */
 .status {
     grid-area: status;
-    min-width: 500px;
+    width: 600px;
     height: 200px;
     overflow-wrap: break-word;
     padding: 20px;
+    background-color: aqua;
 }
 
 .piano {

@@ -5,6 +5,7 @@ import './Status.css'
 
 function Statusv2() {
     const [isReady, setIsReady] = useState(false); // data from the server
+    const [opponentReady, setOpponentReady] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [afterMatch, setIsAfterMatch] = useState(false);
 
@@ -12,7 +13,6 @@ function Statusv2() {
     
     const [time, setTime] = useState<any>();
     const [message, setMessage] = useState<string>();
-    const [result, setResult] = useState<string>();
     
     const navigate = useNavigate();
 
@@ -22,8 +22,15 @@ function Statusv2() {
     };
 
     const handleReady = () => {
-        socket.emit('ready');
-        setIsReady(true);
+        if (isReady) {
+            setIsReady(false);
+            socket.emit('ready', false);
+            console.log('not ready');
+        } else {
+            socket.emit('ready', true);
+            setIsReady(true);
+            console.log('ready');
+        }
     };
 
     const handleRestart = () => {
@@ -57,6 +64,10 @@ function Statusv2() {
             setTime(data.time)
         });
 
+        socket.on('opponent_ready', (data) => {
+            setOpponentReady(data);
+        })
+
         socket.on('start_game_server', () => {
             setPlaying(true);
             socket.emit('start_game_client');
@@ -71,9 +82,9 @@ function Statusv2() {
             setPlaying(false);
             setIsAfterMatch(true);
             if (data.tie) {
-                setResult('Tie !')
+                // setResult('Tie !')
             } else {
-                setResult(`The winner is ${data.winner}`)
+                // setResult(`The winner is ${data.winner}`)
             }
             console.log(data)
         });
@@ -100,13 +111,13 @@ function Statusv2() {
                     onClick={handleReady}
                     className={isReady ? "button-clicked" : "button-default"}
                 >
-                    Ready
+                    Ready: {isReady ? "Ready" : "Not Ready"}
                 </button>
                 <p></p>
                 <button 
                     onClick={() => handleMode(mode)}
-                    disabled={isReady}
-                    className={isReady ? "button-disabled" : "button-default"}
+                    disabled={ isReady || opponentReady }
+                    className={ isReady || opponentReady ? "button-disabled" : "button-default" }
                 >
                     Mode: {mode}
                 </button>
