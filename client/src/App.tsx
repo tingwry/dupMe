@@ -3,9 +3,10 @@ import "./App.css";
 
 import Room from "./pages/Room/Room";
 import Home from "./pages/Home/Home";
-import HowToPlay from "./components/HowToPlay";
+// import HowToPlay from "./components/HowToPlay";
 import ChatRoom from "./components/ChatRoom/ChatRoom";
 import SupportUs from "./pages/SupportUs/SupportUs";
+import HowToPlay from "./pages/HowToPlay/HowToPlay";
 
 function App() {
     return (
