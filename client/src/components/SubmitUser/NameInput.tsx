@@ -16,17 +16,26 @@ function NameInput({ avatar }: { avatar: string }) {
 
   // random names
   const allNames = [
-    "kninkLnWza",
-    "falaka",
-    "palm.me",
+    "KninkLnWza",
+    "Falaka",
+    "Palm.me",
     "w่oมapalmy",
-    "chanaearn",
-    "tingtingsuaymak",
-    "kitkanan",
-    "nololo",
-    "nopocho",
-    "woroyo",
-    "kokono",
+    "Chanaearn",
+    "Tingtingsuaymak",
+    "Kitkanan",
+    "Nololo",
+    "Nopocho",
+    "Woroyo",
+    "Kokono",
+    "Balaya",
+    "Aj jaidee maak",
+    "Pls give me A",
+    "Best Pianist",
+    "Beethoven",
+    "Mozart",
+    "Chopin",
+    "Ink Warunthorn",
+    "Getsunova"
   ];
 
   const handleRandomName = () => {
@@ -41,6 +50,7 @@ function NameInput({ avatar }: { avatar: string }) {
         value={name}
         onChange={handleNameChange}
         placeholder="Enter your name"
+        required
       />{" "}
       <img
         src="/pictures/game_die.png"
