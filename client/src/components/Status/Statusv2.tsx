@@ -88,11 +88,11 @@ function Statusv2() {
             // combine tie and winner
             setPlaying(false);
             setIsAfterMatch(true);
-            if (data.tie) {
-                // setResult('Tie !')
-            } else {
-                // setResult(`The winner is ${data.winner}`)
-            }
+            // if (data.tie) {
+            //     // setResult('Tie !')
+            // } else {
+            //     // setResult(`The winner is ${data.winner}`)
+            // }
             console.log(data)
         });
 
@@ -102,6 +102,17 @@ function Statusv2() {
             setIsAfterMatch(false);
             setMessage("");
         });
+
+        return () => {
+            socket.off('mode');
+            socket.off('turn');
+            socket.off('time');
+            socket.off('opponent_ready')
+            socket.off('start_game_server');
+            socket.off('start_game');
+            socket.off('end_game');
+            socket.off('restart');
+        }
 
     }, [socket]);
 

@@ -152,7 +152,18 @@ function Pianov2() {
       setIsCreating(false);
       setIsFollowing(false);
     });
-  }, [socket, notelist, notelistReceived, sound]);
+
+    return () => {
+      socket.off('mode')
+      socket.off("start_create");
+      socket.off('receive_notelist')
+      socket.off("start_follow");
+      socket.off("start_turn");
+      socket.off("restart");
+      socket.off("surrender");
+    };
+
+  }, [socket, notelist, notelistReceived, sound, round]);
 
   return (
     <>
