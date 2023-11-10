@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import socket from "../../socket";
-import { AvatarGenerator } from "random-avatar-generator";
+// import { AvatarGenerator } from "random-avatar-generator";
 
 function NameInput({ avatar }: { avatar: string }) {
   const [name, setName] = useState<string>("");

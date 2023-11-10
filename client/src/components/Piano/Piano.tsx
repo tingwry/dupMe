@@ -22,22 +22,22 @@ function Piano() {
   const [soundCSS, setSoundCSS] = useState(true);
 
   const handleClickNote = (item: string) => {
+    if (sound == "Default") {
+      const audio = new Audio(`sounds/${item}.mp3`);
+      audio.play();
+    } else if (sound == "Cat") {
+      const audio = new Audio(`sounds_cat/${item}_cat.mp3`);
+      audio.play();
+    }
+
     if (isCreating || isFollowing) {
       setNotelist((prevNotelist) => {
         const newNote = { id: notelist.length, note: item };
         const updatedNotelist = [...prevNotelist, newNote]; //Add in array
         return updatedNotelist;
       });
-
-      if (sound == "Default") {
-        const audio = new Audio(`sounds/${item}.mp3`);
-        audio.play();
-      } else if (sound == "Cat") {
-        const audio = new Audio(`sounds_cat/${item}_cat.mp3`);
-        audio.play();
-      }
-      return;
     }
+    return;
   };
 
   useEffect(() => {
@@ -218,7 +218,7 @@ function Piano() {
             </div>
             ))}
         </div>
-        <button onClick={handleDelete}>Delete previous note</button>
+        {/* <button onClick={handleDelete}>Delete previous note</button> */}
         <p></p>
         <div className="sound-container">
             <div className="sound-title">Piano Sound: </div>
